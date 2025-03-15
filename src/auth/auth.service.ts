@@ -1,0 +1,235 @@
+import {
+  Injectable,
+  BadRequestException,
+  UnprocessableEntityException,
+  NotFoundException,
+  UnauthorizedException,
+  HttpStatus,
+  Inject,
+} from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
+import { envs } from 'src/configuration';
+import { JwtService } from '@nestjs/jwt';
+import { SignInDto } from './dto/sign-in.dto';
+import { SignUpDto } from './dto/sign-up.dto';
+import { Utils } from 'src/commons/utils/utils';
+import { scopes } from 'src/commons/constants/scopes';
+import { AuthRepository } from './repository/auth.repository';
+import { ChangePasswordDto } from './dto/change-password.dto';
+import { RecoveryPasswordDto } from './dto/recovery-password.dto';
+import { ClientProxy, RpcException } from '@nestjs/microservices';
+import { JwtPayloadInterface } from 'src/commons/interfaces/jwt-payload.interface';
+
+@Injectable()
+export class AuthService {
+  constructor(
+    private utils: Utils,
+    private jwtService: JwtService,
+    private readonly repository: AuthRepository,
+    @Inject(envs.notification_services_name)
+    private readonly notificationClient: ClientProxy,
+  ) {}
+
+  /**
+   * Do Sign In
+   * @param createAuthDto
+   * @returns
+   */
+  async signIn(createAuthDto: SignInDto) {
+    // validate isset user
+    const user = await this.repository.find({
+      key: 'username',
+      value: createAuthDto.username,
+    });
+    if (!user)
+      throw new RpcException({
+        message: `User with this username: ${createAuthDto.username} don't found.`,
+        status: HttpStatus.NOT_FOUND,
+      });
+
+    // compare password
+    if (!(await bcrypt.compare(createAuthDto.password, user.password)))
+      throw new RpcException({
+        message: 'Password incorrect',
+        status: HttpStatus.UNAUTHORIZED,
+      });
+
+    try {
+      const token = await this.getJwtToken({
+        id: user._id,
+        scopes: user.scopes,
+      });
+
+      return {
+        success: true,
+        user,
+        token,
+        message: 'Sign In successfully',
+      };
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        status: HttpStatus.BAD_REQUEST,
+      });
+    }
+  }
+
+  /**
+   * Do Sign Up
+   * @param signUpDto
+   * @returns
+   */
+  async signUp(signUpDto: SignUpDto) {
+    // validate if user exist with this email
+    const issetUserWithEmail = await this.repository.find({
+      key: 'email',
+      value: signUpDto.email,
+    });
+    if (issetUserWithEmail)
+      throw new RpcException({
+        message: `Exist one user with this email: ${signUpDto.email}.`,
+        status: HttpStatus.CONFLICT,
+      });
+
+    // validate if yser exist with this username
+    const issetUserWithUsername = await this.repository.find({
+      key: 'username',
+      value: signUpDto.username,
+    });
+    if (issetUserWithUsername)
+      throw new RpcException({
+        message: `Exist one user with this username: ${signUpDto.username}.`,
+        status: HttpStatus.CONFLICT,
+      });
+
+    // if all is ok
+    try {
+      const { password, ...userData } = signUpDto;
+      const user = await this.repository.create({
+        ...userData,
+        password: await bcrypt.hash(password, 10),
+        scopes: scopes,
+      });
+
+      // send welcome notification
+      this.notificationClient.emit('createNotitication', {
+        data: user,
+        channel: 'email',
+        type_notification: 'welcome_notification',
+        destinatary: user?.email,
+      });
+
+      // return response
+      return {
+        success: true,
+        user,
+        token: await this.getJwtToken({ id: user._id, scopes: user.scopes }),
+        message: 'Sign Up successfully',
+      };
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        status: HttpStatus.BAD_REQUEST,
+      });
+    }
+  }
+
+  /**
+   * Init recovery password
+   * @param recoveryPasswordDto
+   * @returns
+   */
+  async recoveryPassword(recoveryPasswordDto: RecoveryPasswordDto) {
+    // validate exist user
+    let user = await this.repository.find({
+      key: 'email',
+      value: recoveryPasswordDto.email,
+    });
+    if (!user)
+      throw new RpcException({
+        message: `User with this email: ${recoveryPasswordDto.email} don't found.`,
+        status: HttpStatus.NOT_FOUND,
+      });
+
+    // init recovery process
+    try {
+      user.recovery_token = this.utils.generateUuId();
+      user = await this.repository.update(user._id, user);
+
+      // return response
+      return {
+        success: true,
+        user,
+        message: 'Password recovery process started successfully',
+      };
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        status: HttpStatus.BAD_REQUEST,
+      });
+    }
+  }
+
+  /**
+   * Change password
+   * @param recoveryPasswordDto
+   * @returns
+   */
+  async changePassword(changePasswordDto: ChangePasswordDto) {
+    // validate exist user
+    let user = await this.repository.find({
+      key: 'email',
+      value: changePasswordDto.email,
+    });
+    if (!user)
+      throw new RpcException({
+        message: `User with this email: ${changePasswordDto.email} don't found.`,
+        status: HttpStatus.NOT_FOUND,
+      });
+
+    if (!user.recovery_token)
+      throw new RpcException({
+        message: `Recovery proccess don´t init`,
+        status: HttpStatus.BAD_REQUEST,
+      });
+
+    if (changePasswordDto.token !== user.recovery_token)
+      throw new RpcException({
+        message: `The recovery token is incorrect.`,
+        status: HttpStatus.FORBIDDEN,
+      });
+
+    // change password
+    try {
+      user.recovery_token = null; // clear token recovery.
+      (user.password = await bcrypt.hash(changePasswordDto.password, 10)),
+        (user = await this.repository.update(user._id, user));
+
+      // return response
+      return {
+        success: true,
+        user,
+        message: 'Password changed successfully',
+      };
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        status: HttpStatus.BAD_REQUEST,
+      });
+    }
+  }
+
+  /**
+   * Generate token JWT
+   * @param payload
+   * @returns
+   */
+  private async getJwtToken(payload: JwtPayloadInterface): Promise<string> {
+    try {
+      const token = await this.jwtService.signAsync(payload);
+      return token;
+    } catch (error) {
+      throw new RpcException(error.message);
+    }
+  }
+}
