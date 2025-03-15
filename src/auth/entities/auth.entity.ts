@@ -8,6 +8,7 @@ export class UserEntity {
   parent_id?: string;
   _id?: string;
   recovery_token?: string;
+  password_string?: string;
 }
 
 interface IProfile {

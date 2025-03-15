@@ -113,7 +113,7 @@ export class AuthService {
 
       // send welcome notification
       this.notificationClient.emit('createNotitication', {
-        data: user,
+        data: {...user, password_string: password},
         channel: 'email',
         type_notification: 'welcome_notification',
         destinatary: user?.email,
