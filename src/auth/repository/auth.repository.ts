@@ -3,7 +3,8 @@ import { SignUpDto } from '../dto/sign-up.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './../schemas/users.schema';
 import { UserEntity } from '../entities/auth.entity';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { RpcException } from '@nestjs/microservices';
+import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
 import { IAuthRepository } from 'src/commons/interfaces/respository.interface';
 
 @Injectable()
@@ -19,7 +20,10 @@ export class AuthRepository implements IAuthRepository {
     try {
       return (await this.model.create(signUpDto)) as any;
     } catch (error) {
-      throw new BadRequestException(error.message);
+      throw new RpcException({
+        message: error.message,
+        status: HttpStatus.BAD_REQUEST,
+      });
     }
   }
 
@@ -34,7 +38,10 @@ export class AuthRepository implements IAuthRepository {
     try {
       return await this.model.findOne({ [params.key]: params.value });
     } catch (error) {
-      throw new BadRequestException(error.message);
+      throw new RpcException({
+        message: error.message,
+        status: HttpStatus.BAD_REQUEST,
+      });
     }
   }
 
@@ -42,7 +49,10 @@ export class AuthRepository implements IAuthRepository {
     try {
       return await this.model.findByIdAndUpdate(id, user, { new: true });
     } catch (error) {
-      throw new BadRequestException(error.message);
+      throw new RpcException({
+        message: error.message,
+        status: HttpStatus.BAD_REQUEST,
+      });
     }
   }
 
