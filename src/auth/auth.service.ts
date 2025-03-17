@@ -156,6 +156,14 @@ export class AuthService {
       user.recovery_token = this.utils.generateUuId();
       user = await this.repository.update(user._id, user);
 
+      // send welcome notification
+      this.notificationClient.emit('createNotitication', {
+        data: {...JSON.parse(JSON.stringify(user))},
+        channel: 'email',
+        type_notification: 'recovery_password_notification',
+        destinatary: user?.email,
+      });
+
       // return response
       return {
         success: true,
