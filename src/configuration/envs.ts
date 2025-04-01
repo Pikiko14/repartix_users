@@ -10,7 +10,7 @@ interface EnvVars {
   NOTIFICATION_SERVICE_NAME: string;
   NOTIFICATION_SERVICE_HOST: string;
   NOTIFICATION_SERVICE_PORT: string;
-  
+  NATS_URL: string;
 }
 
 const envsSchema = joi.object({
@@ -22,6 +22,7 @@ const envsSchema = joi.object({
   NOTIFICATION_SERVICE_NAME: joi.string().required(),
   NOTIFICATION_SERVICE_HOST: joi.string().required(),
   NOTIFICATION_SERVICE_PORT: joi.string().required(),
+  NATS_URL: joi.string().required(),
 })
 .unknown(true);
 
@@ -46,4 +47,5 @@ export const envs = {
   auth_service_host: envVars.NOTIFICATION_SERVICE_HOST,
   auth_service_port: envVars.NOTIFICATION_SERVICE_PORT,
   notification_services_name: envVars.NOTIFICATION_SERVICE_NAME,
+  nats_server: envVars.NATS_URL,
 }
