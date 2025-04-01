@@ -19,10 +19,8 @@ const envsSchema = joi.object({
   ATLAS_URL: joi.string().required(),
   DB_URL: joi.string().required(),
   JWT_SECRET: joi.string().required(),
-  NOTIFICATION_SERVICE_NAME: joi.string().required(),
-  NOTIFICATION_SERVICE_HOST: joi.string().required(),
-  NOTIFICATION_SERVICE_PORT: joi.string().required(),
   NATS_URL: joi.string().required(),
+  NOTIFICATION_SERVICE_NAME: joi.string().required(),
 })
 .unknown(true);
 
@@ -44,8 +42,6 @@ export const envs = {
   atlas_url: envVars.ATLAS_URL,
   db_url: envVars.DB_URL,
   jwt_secret: envVars.JWT_SECRET,
-  auth_service_host: envVars.NOTIFICATION_SERVICE_HOST,
-  auth_service_port: envVars.NOTIFICATION_SERVICE_PORT,
   notification_services_name: envVars.NOTIFICATION_SERVICE_NAME,
   nats_server: envVars.NATS_URL,
 }
