@@ -3,8 +3,6 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 export type UserDocument = HydratedDocument<User>;
 
-
-
 @Schema({ _id: false })
 class Profile {
   @Prop({ required: false, index: true })
@@ -17,8 +15,6 @@ class Profile {
   phone?: string;
 }
 export const ProfileSchema = SchemaFactory.createForClass(Profile);
-
-
 
 @Schema({ _id: false })
 class Configuration {
@@ -77,3 +73,11 @@ export class User {
 }
 
 export const UsersSchema = SchemaFactory.createForClass(User);
+
+// Excluir la contraseña al convertir a JSON
+UsersSchema.set('toJSON', {
+  transform: function (_, ret) {
+    delete ret.password;
+    return ret;
+  },
+});
