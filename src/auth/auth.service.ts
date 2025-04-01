@@ -59,7 +59,7 @@ export class AuthService {
         id: user._id,
         scopes: user.scopes,
       });
-
+      delete user.password;
       return {
         success: true,
         user,
