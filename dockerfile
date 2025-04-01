@@ -1,4 +1,4 @@
-FROM node:21-bullseye
+FROM node:21-alpine
 
 WORKDIR /usr/src/users_microservice
 
