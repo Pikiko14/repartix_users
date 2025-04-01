@@ -7,10 +7,8 @@ interface EnvVars {
   ATLAS_URL: string;
   DB_URL: string;
   JWT_SECRET: string;
-  NOTIFICATION_SERVICE_NAME: string;
-  NOTIFICATION_SERVICE_HOST: string;
-  NOTIFICATION_SERVICE_PORT: string;
   NATS_URL: string;
+  NATH_SERVICE: string;
 }
 
 const envsSchema = joi.object({
@@ -20,7 +18,7 @@ const envsSchema = joi.object({
   DB_URL: joi.string().required(),
   JWT_SECRET: joi.string().required(),
   NATS_URL: joi.string().required(),
-  NOTIFICATION_SERVICE_NAME: joi.string().required(),
+  NATH_SERVICE: joi.string().required(),
 })
 .unknown(true);
 
@@ -42,6 +40,6 @@ export const envs = {
   atlas_url: envVars.ATLAS_URL,
   db_url: envVars.DB_URL,
   jwt_secret: envVars.JWT_SECRET,
-  notification_services_name: envVars.NOTIFICATION_SERVICE_NAME,
   nats_server: envVars.NATS_URL,
+  nats_service_name: envVars.NATH_SERVICE,
 }

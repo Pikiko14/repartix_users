@@ -26,8 +26,8 @@ export class AuthService {
     private utils: Utils,
     private jwtService: JwtService,
     private readonly repository: AuthRepository,
-    @Inject(envs.notification_services_name)
-    private readonly notificationClient: ClientProxy,
+    @Inject(envs.nats_service_name)
+    private readonly client: ClientProxy,
   ) {}
 
   /**
@@ -112,7 +112,7 @@ export class AuthService {
       });
 
       // send welcome notification
-      this.notificationClient.emit('createNotitication', {
+      this.client.emit('createNotitication', {
         data: {...JSON.parse(JSON.stringify(user)), password_string: password},
         channel: 'email',
         type_notification: 'welcome_notification',
@@ -157,7 +157,7 @@ export class AuthService {
       user = await this.repository.update(user._id, user);
 
       // send welcome notification
-      this.notificationClient.emit('createNotitication', {
+      this.client.emit('createNotitication', {
         data: {...JSON.parse(JSON.stringify(user))},
         channel: 'email',
         type_notification: 'recovery_password_notification',
