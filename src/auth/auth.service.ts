@@ -60,7 +60,8 @@ export class AuthService {
         id: user._id,
         scopes: user.scopes,
       });
-      const subscription = firstValueFrom(await this.client.send('get_user_subscription', user.parent_id || user._id));
+      const subscription = await firstValueFrom(this.client.send('get_user_subscription', user.parent_id || user._id));
+      console.log(subscription);
       return {
         success: true,
         user: {
