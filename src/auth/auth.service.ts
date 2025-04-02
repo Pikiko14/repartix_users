@@ -8,6 +8,7 @@ import {
   Inject,
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
+import { firstValueFrom } from 'rxjs';
 import { envs } from 'src/configuration';
 import { JwtService } from '@nestjs/jwt';
 import { SignInDto } from './dto/sign-in.dto';
@@ -59,9 +60,13 @@ export class AuthService {
         id: user._id,
         scopes: user.scopes,
       });
+      const subscription = firstValueFrom(await this.client.send('get_user_subscription', user.parent_id || user._id));
       return {
         success: true,
-        user,
+        user: {
+          ...JSON.parse(JSON.stringify(user)),
+          subscription,
+        },
         token,
         message: 'Sign In successfully',
       };
