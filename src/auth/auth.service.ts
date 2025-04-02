@@ -61,7 +61,7 @@ export class AuthService {
         scopes: user.scopes,
       });
       const subscription = await firstValueFrom(this.client.send('get_user_subscription', user.parent_id || user._id));
-      console.log(subscription);
+
       return {
         success: true,
         user: {
