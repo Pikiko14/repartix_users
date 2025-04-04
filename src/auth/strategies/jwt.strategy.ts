@@ -22,10 +22,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: JwtPayloadInterface): Promise<JwtPayloadInterface> {
-    const { id } = payload;
+    const { id, parent } = payload;
 
     const user = {
       id,
+      parent,
       scopes: [],
     };
 

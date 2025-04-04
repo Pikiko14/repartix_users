@@ -58,9 +58,12 @@ export class AuthService {
     try {
       const token = await this.getJwtToken({
         id: user._id,
+        parent: user.parent_id || null,
         scopes: user.scopes,
       });
-      const subscription = await firstValueFrom(this.client.send('get_user_subscription', user.parent_id || user._id));
+      const subscription = await firstValueFrom(
+        this.client.send('get_user_subscription', user.parent_id || user._id),
+      );
 
       return {
         success: true,
@@ -113,12 +116,15 @@ export class AuthService {
       const user = await this.repository.create({
         ...userData,
         password: await bcrypt.hash(password, 10),
-        scopes: scopes,
+        scopes: signUpDto?.scopes || scopes,
       });
 
       // send welcome notification
       this.client.emit('createNotitication', {
-        data: {...JSON.parse(JSON.stringify(user)), password_string: password},
+        data: {
+          ...JSON.parse(JSON.stringify(user)),
+          password_string: password,
+        },
         channel: 'email',
         type_notification: 'welcome_notification',
         destinatary: user?.email,
@@ -128,7 +134,11 @@ export class AuthService {
       return {
         success: true,
         user,
-        token: await this.getJwtToken({ id: user._id, scopes: user.scopes }),
+        token: await this.getJwtToken({
+          id: user._id,
+          parent: user.parent_id || null,
+          scopes: user.scopes,
+        }),
         message: 'Sign Up successfully',
       };
     } catch (error) {
@@ -163,7 +173,7 @@ export class AuthService {
 
       // send welcome notification
       this.client.emit('createNotitication', {
-        data: {...JSON.parse(JSON.stringify(user))},
+        data: { ...JSON.parse(JSON.stringify(user)) },
         channel: 'email',
         type_notification: 'recovery_password_notification',
         destinatary: user?.email,
