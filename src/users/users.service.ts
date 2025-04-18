@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { AuthService } from 'src/auth/auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UserEntity } from 'src/auth/entities/auth.entity';
 
 @Injectable()
 export class UsersService {
@@ -27,5 +28,14 @@ export class UsersService {
 
   remove(id: number) {
     return `This action removes a #${id} user`;
+  }
+
+  /**
+   * Count users by parent
+   * @param parentId 
+   * @returns { number }
+   */
+  async countUsers(parentId: string): Promise<number | void> {
+    return await this.authService.countUsersByParent(parentId);
   }
 }

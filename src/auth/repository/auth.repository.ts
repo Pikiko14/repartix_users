@@ -45,6 +45,12 @@ export class AuthRepository implements IAuthRepository {
     }
   }
 
+  /**
+   * Update users
+   * @param id
+   * @param user
+   * @returns
+   */
   async update(id: string, user: UserEntity): Promise<UserEntity | null> {
     try {
       return await this.model.findByIdAndUpdate(id, user, { new: true });
@@ -56,7 +62,27 @@ export class AuthRepository implements IAuthRepository {
     }
   }
 
-  delete(id: string): Promise<void> {
+  /**
+   * Delete users
+   * @param id
+   */
+  async delete(id: string): Promise<void> {
     throw new Error('Method not implemented.');
+  }
+
+  /**
+   * Count users by parent
+   * @param parentId 
+   * @returns 
+   */
+  async countUsersByParent(parentId: string): Promise<void | number> {
+    try {
+      return await this.model.countDocuments({ parent_id: parentId });
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        status: HttpStatus.BAD_REQUEST,
+      });
+    }
   }
 }

@@ -14,6 +14,7 @@ import { JwtService } from '@nestjs/jwt';
 import { SignInDto } from './dto/sign-in.dto';
 import { SignUpDto } from './dto/sign-up.dto';
 import { Utils } from 'src/commons/utils/utils';
+import { UserEntity } from './entities/auth.entity';
 import { scopes } from 'src/commons/constants/scopes';
 import { AuthRepository } from './repository/auth.repository';
 import { ChangePasswordDto } from './dto/change-password.dto';
@@ -254,5 +255,14 @@ export class AuthService {
     } catch (error) {
       throw new RpcException(error.message);
     }
+  }
+
+  /**
+   * Count users by parent
+   * @param parentId 
+   * @returns { number }
+   */
+  async countUsersByParent(parentId: string): Promise<number | void> {
+    return await this.repository.countUsersByParent(parentId);
   }
 }
