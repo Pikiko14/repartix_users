@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { AuthService } from 'src/auth/auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 import { UpdateUserCredentialDto } from './dto/update-user-credential.dto';
 
 @Injectable()
@@ -28,5 +29,13 @@ export class UsersService {
    */
   async updateCredentials(updateUserCredentialDto: UpdateUserCredentialDto) {
     return await this.authService.updateCredentials(updateUserCredentialDto);
+  }
+
+  /**
+   * Update user profile
+   * @param { UpdateUserCredentialDto } updateDredentialsDto
+   */
+  async updateUserProfile(updateUserProfileDto: UpdateUserProfileDto) {
+    return await this.authService.updateUserProfile(updateUserProfileDto);
   }
 }

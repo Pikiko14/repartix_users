@@ -22,6 +22,7 @@ import { RecoveryPasswordDto } from './dto/recovery-password.dto';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { JwtPayloadInterface } from 'src/commons/interfaces/jwt-payload.interface';
 import { UpdateUserCredentialDto } from 'src/users/dto/update-user-credential.dto';
+import { UpdateUserProfileDto } from 'src/users/dto/update-user-profile.dto';
 
 @Injectable()
 export class AuthService {
@@ -260,7 +261,7 @@ export class AuthService {
 
   /**
    * Count users by parent
-   * @param parentId 
+   * @param parentId
    * @returns { number }
    */
   async countUsersByParent(parentId: string): Promise<number | void> {
@@ -271,7 +272,7 @@ export class AuthService {
    * Update user credential
    * @param { UpdateUserCredentialDto } updateDredentialsDto
    */
-  async updateCredentials (updateUserCredentialDto: UpdateUserCredentialDto) {
+  async updateCredentials(updateUserCredentialDto: UpdateUserCredentialDto) {
     try {
       let user = await this.repository.find({
         key: '_id',
@@ -283,9 +284,10 @@ export class AuthService {
         key: 'email',
         value: updateUserCredentialDto.email,
       });
-      console.log(issetUserWithEmail);
-      console.log(issetUserWithEmail._id.toString());
-      if (issetUserWithEmail && issetUserWithEmail._id.toString() !== updateUserCredentialDto.user_id)
+      if (
+        issetUserWithEmail &&
+        issetUserWithEmail._id.toString() !== updateUserCredentialDto.user_id
+      )
         throw new RpcException({
           message: `Exist one user with this email: ${updateUserCredentialDto.email}.`,
           status: HttpStatus.CONFLICT,
@@ -296,7 +298,10 @@ export class AuthService {
         key: 'username',
         value: updateUserCredentialDto.username,
       });
-      if (issetUserWithUsername && issetUserWithUsername._id.toString() !== updateUserCredentialDto.user_id)
+      if (
+        issetUserWithUsername &&
+        issetUserWithUsername._id.toString() !== updateUserCredentialDto.user_id
+      )
         throw new RpcException({
           message: `Exist one user with this username: ${updateUserCredentialDto.username}.`,
           status: HttpStatus.CONFLICT,
@@ -307,11 +312,34 @@ export class AuthService {
       if (updateUserCredentialDto.password) {
         user.password = await bcrypt.hash(updateUserCredentialDto.password, 10);
       }
-      user = await this.repository.update(user._id, user)
+      user = await this.repository.update(user._id, user);
       return {
         success: true,
         user,
         message: 'Credentials Change Success',
+      };
+    } catch (error) {
+      throw new RpcException(error.message);
+    }
+  }
+
+  /**
+   * Update user Profile
+   * @param { UpdateUserProfileDto } updateUserProfile
+   * @return
+   */
+  async updateUserProfile(updateUserProfile: UpdateUserProfileDto) {
+    let user = await this.repository.find({
+      key: '_id',
+      value: updateUserProfile.user_id,
+    });
+    try {
+      user.profile = updateUserProfile;
+      user = await this.repository.update(user._id, user);
+      return {
+        success: true,
+        user,
+        message: 'Profile Update Success',
       };
     } catch (error) {
       throw new RpcException(error.message);
