@@ -283,7 +283,9 @@ export class AuthService {
         key: 'email',
         value: updateUserCredentialDto.email,
       });
-      if (issetUserWithEmail)
+      console.log(issetUserWithEmail);
+      console.log(issetUserWithEmail._id.toString());
+      if (issetUserWithEmail && issetUserWithEmail._id.toString() !== updateUserCredentialDto.user_id)
         throw new RpcException({
           message: `Exist one user with this email: ${updateUserCredentialDto.email}.`,
           status: HttpStatus.CONFLICT,
@@ -294,7 +296,7 @@ export class AuthService {
         key: 'username',
         value: updateUserCredentialDto.username,
       });
-      if (issetUserWithUsername)
+      if (issetUserWithUsername && issetUserWithUsername._id.toString() !== updateUserCredentialDto.user_id)
         throw new RpcException({
           message: `Exist one user with this username: ${updateUserCredentialDto.username}.`,
           status: HttpStatus.CONFLICT,
