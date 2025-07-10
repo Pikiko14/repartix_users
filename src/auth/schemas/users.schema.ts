@@ -13,6 +13,9 @@ class Profile {
 
   @Prop()
   phone?: string;
+
+  @Prop()
+  age?: number;
 }
 export const ProfileSchema = SchemaFactory.createForClass(Profile);
 
