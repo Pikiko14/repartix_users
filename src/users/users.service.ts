@@ -1,8 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { AuthService } from 'src/auth/auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { UserEntity } from 'src/auth/entities/auth.entity';
+import { UpdateUserCredentialDto } from './dto/update-user-credential.dto';
 
 @Injectable()
 export class UsersService {
@@ -14,22 +13,6 @@ export class UsersService {
     return await this.authService.signUp(createUserDto)
   }
 
-  findAll() {
-    return `This action returns all users`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
-  }
-
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
-  }
-
   /**
    * Count users by parent
    * @param parentId 
@@ -37,5 +20,13 @@ export class UsersService {
    */
   async countUsers(parentId: string): Promise<number | void> {
     return await this.authService.countUsersByParent(parentId);
+  }
+
+  /**
+   * Update user credential
+   * @param { UpdateUserCredentialDto } updateDredentialsDto
+   */
+  async updateCredentials(updateUserCredentialDto: UpdateUserCredentialDto) {
+    return await this.authService.updateCredentials(updateUserCredentialDto);
   }
 }

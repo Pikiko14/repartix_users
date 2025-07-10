@@ -21,6 +21,7 @@ import { ChangePasswordDto } from './dto/change-password.dto';
 import { RecoveryPasswordDto } from './dto/recovery-password.dto';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { JwtPayloadInterface } from 'src/commons/interfaces/jwt-payload.interface';
+import { UpdateUserCredentialDto } from 'src/users/dto/update-user-credential.dto';
 
 @Injectable()
 export class AuthService {
@@ -264,5 +265,54 @@ export class AuthService {
    */
   async countUsersByParent(parentId: string): Promise<number | void> {
     return await this.repository.countUsersByParent(parentId);
+  }
+
+  /**
+   * Update user credential
+   * @param { UpdateUserCredentialDto } updateDredentialsDto
+   */
+  async updateCredentials (updateUserCredentialDto: UpdateUserCredentialDto) {
+    try {
+      let user = await this.repository.find({
+        key: '_id',
+        value: updateUserCredentialDto.user_id,
+      });
+
+      // validate if user exist with this email
+      const issetUserWithEmail = await this.repository.find({
+        key: 'email',
+        value: updateUserCredentialDto.email,
+      });
+      if (issetUserWithEmail)
+        throw new RpcException({
+          message: `Exist one user with this email: ${updateUserCredentialDto.email}.`,
+          status: HttpStatus.CONFLICT,
+        });
+
+      // validate if yser exist with this username
+      const issetUserWithUsername = await this.repository.find({
+        key: 'username',
+        value: updateUserCredentialDto.username,
+      });
+      if (issetUserWithUsername)
+        throw new RpcException({
+          message: `Exist one user with this username: ${updateUserCredentialDto.username}.`,
+          status: HttpStatus.CONFLICT,
+        });
+
+      user.email = updateUserCredentialDto.email;
+      user.username = updateUserCredentialDto.username;
+      if (updateUserCredentialDto.password) {
+        user.password = await bcrypt.hash(updateUserCredentialDto.password, 10);
+      }
+      user = await this.repository.update(user._id, user)
+      return {
+        success: true,
+        user,
+        message: 'Credentials Change Success',
+      };
+    } catch (error) {
+      throw new RpcException(error.message);
+    }
   }
 }

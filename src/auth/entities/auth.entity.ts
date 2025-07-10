@@ -29,4 +29,5 @@ interface IBrand {
 
 interface IConfiguration {
   currency: string;
+  enable_google_map?: boolean;
 }
