@@ -23,6 +23,21 @@ export const ProfileSchema = SchemaFactory.createForClass(Profile);
 class Configuration {
   @Prop()
   currency?: string;
+
+  @Prop()
+  country?: string;
+
+  @Prop()
+  gmap_api__key?: string;
+
+  @Prop()
+  route_price_by_km?: boolean;
+
+  @Prop()
+  enable_google_map?: boolean;
+
+  @Prop()
+  price_by_km?: number;
 }
 export const ConfigurationSchema = SchemaFactory.createForClass(Configuration);
 

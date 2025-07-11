@@ -28,6 +28,10 @@ interface IBrand {
 }
 
 interface IConfiguration {
-  currency: string;
+  country?: string;
+  currency?: string;
+  gmap_api__key?: string;
+  route_price_by_km?: boolean;
   enable_google_map?: boolean;
+  price_by_km?: number;
 }

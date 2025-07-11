@@ -345,4 +345,27 @@ export class AuthService {
       throw new RpcException(error.message);
     }
   }
+
+  /**
+   * Update user Profile
+   * @param { UpdateUserProfileDto } updateUserProfile
+   * @return
+   */
+  async updateUserBrand(updateUserProfile: UpdateUserProfileDto) {
+    let user = await this.repository.find({
+      key: '_id',
+      value: updateUserProfile.user_id,
+    });
+    try {
+      user.profile = updateUserProfile;
+      user = await this.repository.update(user._id, user);
+      return {
+        success: true,
+        user,
+        message: 'Profile Update Success',
+      };
+    } catch (error) {
+      throw new RpcException(error.message);
+    }
+  }
 }
