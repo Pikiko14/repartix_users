@@ -1,4 +1,12 @@
-import { IsString, IsOptional, IsNumber, IsInt, Min, Max } from "class-validator";
+import {
+  IsString,
+  IsOptional,
+  IsNumber,
+  IsInt,
+  Min,
+  Max,
+  Matches,
+} from 'class-validator';
 
 export class UpdateUserProfileDto {
   @IsString()
@@ -10,7 +18,10 @@ export class UpdateUserProfileDto {
   address?: string;
 
   @IsOptional()
-  @IsNumber()
+  @IsString()
+  @Matches(/^\+\d{1,3} ?\d{7,12}$/, {
+    message: 'Invalid phone number format',
+  })
   phone?: number;
 
   @IsOptional()
