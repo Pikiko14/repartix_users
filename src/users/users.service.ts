@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { AuthService } from 'src/auth/auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserBrandDto } from './dto/update-user-brand.dto';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 import { UpdateUserCredentialDto } from './dto/update-user-credential.dto';
 
@@ -37,5 +38,13 @@ export class UsersService {
    */
   async updateUserProfile(updateUserProfileDto: UpdateUserProfileDto) {
     return await this.authService.updateUserProfile(updateUserProfileDto);
+  }
+
+  /**
+   * Update user brand
+   * @param { UpdateUserBrandDto } updateUserBrandDto
+   */
+  async updateUserBrand(updateUserBrandDto: UpdateUserBrandDto) {
+    return await this.authService.updateUserBrand(updateUserBrandDto);
   }
 }

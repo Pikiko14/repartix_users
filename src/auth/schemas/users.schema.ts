@@ -50,7 +50,7 @@ class Brand {
   rut?: string;
 
   @Prop()
-  phone?: number;
+  phone?: string;
 
   @Prop()
   address?: string;
@@ -59,7 +59,7 @@ class Brand {
   image_brand?: string;
 
   @Prop({ type: Configuration })
-  configuration: Configuration;
+  configuration?: Configuration;
 }
 export const BrandSchema = SchemaFactory.createForClass(Brand);
 

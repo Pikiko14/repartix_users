@@ -20,9 +20,10 @@ import { AuthRepository } from './repository/auth.repository';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { RecoveryPasswordDto } from './dto/recovery-password.dto';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
+import { UpdateUserBrandDto } from 'src/users/dto/update-user-brand.dto';
+import { UpdateUserProfileDto } from 'src/users/dto/update-user-profile.dto';
 import { JwtPayloadInterface } from 'src/commons/interfaces/jwt-payload.interface';
 import { UpdateUserCredentialDto } from 'src/users/dto/update-user-credential.dto';
-import { UpdateUserProfileDto } from 'src/users/dto/update-user-profile.dto';
 
 @Injectable()
 export class AuthService {
@@ -348,16 +349,16 @@ export class AuthService {
 
   /**
    * Update user Profile
-   * @param { UpdateUserProfileDto } updateUserProfile
+   * @param { UpdateUserBrandDto } updateUserBrand
    * @return
    */
-  async updateUserBrand(updateUserProfile: UpdateUserProfileDto) {
+  async updateUserBrand(updateUserProfile: UpdateUserBrandDto) {
     let user = await this.repository.find({
       key: '_id',
       value: updateUserProfile.user_id,
     });
     try {
-      user.profile = updateUserProfile;
+      user.brand = updateUserProfile as any;
       user = await this.repository.update(user._id, user);
       return {
         success: true,
