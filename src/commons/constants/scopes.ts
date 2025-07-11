@@ -1,1 +1,1 @@
-export const scopes = ['list-user', 'create-user', 'update-user', 'delete-user'];
+export const scopes = ['list-user', 'create-user', 'update-user', 'delete-user', 'update-brand'];
