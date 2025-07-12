@@ -4,20 +4,19 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserBrandDto } from './dto/update-user-brand.dto';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 import { UpdateUserCredentialDto } from './dto/update-user-credential.dto';
+import { UserBrandConfigurationDto } from './dto/update-map-brand.dto';
 
 @Injectable()
 export class UsersService {
-  constructor(
-    @Inject() private readonly authService: AuthService
-  ) {}
+  constructor(@Inject() private readonly authService: AuthService) {}
 
   async create(createUserDto: CreateUserDto) {
-    return await this.authService.signUp(createUserDto)
+    return await this.authService.signUp(createUserDto);
   }
 
   /**
    * Count users by parent
-   * @param parentId 
+   * @param parentId
    * @returns { number }
    */
   async countUsers(parentId: string): Promise<number | void> {
@@ -46,5 +45,15 @@ export class UsersService {
    */
   async updateUserBrand(updateUserBrandDto: UpdateUserBrandDto) {
     return await this.authService.updateUserBrand(updateUserBrandDto);
+  }
+
+  /**
+   * Update user brand configuration
+   * @param { UpdateUserBrandDto } updateUserBrandDto
+   */
+  async updateUserBrandConfiguration(
+    updateUserBrandConfigurationDto: UserBrandConfigurationDto,
+  ) {
+    return await this.authService.updateUserBrandConfiguration(updateUserBrandConfigurationDto);
   }
 }

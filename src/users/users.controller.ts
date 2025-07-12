@@ -7,6 +7,7 @@ import { Usability } from 'src/commons/decorators/usability.decotator';
 import { UsabilitiesGuard } from 'src/commons/guards/usabilities.guard';
 import { UpdateUserCredentialDto } from './dto/update-user-credential.dto';
 import { UpdateUserBrandDto } from './dto/update-user-brand.dto';
+import { UserBrandConfigurationDto } from './dto/update-map-brand.dto';
 
 @Controller()
 export class UsersController {
@@ -32,5 +33,12 @@ export class UsersController {
   @MessagePattern('updateUserBrand')
   updateUserBrand(@Payload() updateUserBrandDto: UpdateUserBrandDto) {
     return this.usersService.updateUserBrand(updateUserBrandDto);
+  }
+
+  @MessagePattern('updateUserBrandConfiguration')
+  updateUserBrandConfiguration(
+    @Payload() updateUserBrandConfigurationDto: UserBrandConfigurationDto,
+  ) {
+    return this.usersService.updateUserBrandConfiguration(updateUserBrandConfigurationDto);
   }
 }

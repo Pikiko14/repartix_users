@@ -24,6 +24,7 @@ import { UpdateUserBrandDto } from 'src/users/dto/update-user-brand.dto';
 import { UpdateUserProfileDto } from 'src/users/dto/update-user-profile.dto';
 import { JwtPayloadInterface } from 'src/commons/interfaces/jwt-payload.interface';
 import { UpdateUserCredentialDto } from 'src/users/dto/update-user-credential.dto';
+import { UserBrandConfigurationDto } from 'src/users/dto/update-map-brand.dto';
 
 @Injectable()
 export class AuthService {
@@ -364,6 +365,31 @@ export class AuthService {
         success: true,
         user,
         message: 'Profile Update Success',
+      };
+    } catch (error) {
+      throw new RpcException(error.message);
+    }
+  }
+
+  /**
+   * Update map brand configuration
+   * @param { UserBrandConfigurationDto } userBrandConfigurationDto
+   * @return
+   */
+  async updateUserBrandConfiguration(
+    userBrandConfigurationDto: UserBrandConfigurationDto,
+  ) {
+    let user = await this.repository.find({
+      key: '_id',
+      value: userBrandConfigurationDto.user_id,
+    });
+    try {
+      user.brand.configuration = userBrandConfigurationDto;
+      user = await this.repository.update(user._id, user);
+      return {
+        success: true,
+        user,
+        message: 'Map Configuration Update Success',
       };
     } catch (error) {
       throw new RpcException(error.message);
