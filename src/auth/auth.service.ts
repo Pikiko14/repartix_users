@@ -24,7 +24,6 @@ import { UpdateUserBrandDto } from 'src/users/dto/update-user-brand.dto';
 import { UpdateUserProfileDto } from 'src/users/dto/update-user-profile.dto';
 import { JwtPayloadInterface } from 'src/commons/interfaces/jwt-payload.interface';
 import { UpdateUserCredentialDto } from 'src/users/dto/update-user-credential.dto';
-import { UserBrandConfigurationDto } from 'src/users/dto/update-map-brand.dto';
 
 @Injectable()
 export class AuthService {
@@ -69,6 +68,14 @@ export class AuthService {
       const subscription = await firstValueFrom(
         this.client.send('get_user_subscription', user.parent_id || user._id),
       );
+
+      if (user && user.parent_id) {
+        const userMain = await this.repository.find({
+          key: '_id',
+          value: user.parent_id,
+        });
+        user.brand = userMain.brand;
+      }
 
       return {
         success: true,
@@ -319,77 +326,6 @@ export class AuthService {
         success: true,
         user,
         message: 'Credentials Change Success',
-      };
-    } catch (error) {
-      throw new RpcException(error.message);
-    }
-  }
-
-  /**
-   * Update user Profile
-   * @param { UpdateUserProfileDto } updateUserProfile
-   * @return
-   */
-  async updateUserProfile(updateUserProfile: UpdateUserProfileDto) {
-    let user = await this.repository.find({
-      key: '_id',
-      value: updateUserProfile.user_id,
-    });
-    try {
-      user.profile = updateUserProfile;
-      user = await this.repository.update(user._id, user);
-      return {
-        success: true,
-        user,
-        message: 'Profile Update Success',
-      };
-    } catch (error) {
-      throw new RpcException(error.message);
-    }
-  }
-
-  /**
-   * Update user Profile
-   * @param { UpdateUserBrandDto } updateUserBrand
-   * @return
-   */
-  async updateUserBrand(updateUserProfile: UpdateUserBrandDto) {
-    let user = await this.repository.find({
-      key: '_id',
-      value: updateUserProfile.user_id,
-    });
-    try {
-      user.brand = updateUserProfile as any;
-      user = await this.repository.update(user._id, user);
-      return {
-        success: true,
-        user,
-        message: 'Profile Update Success',
-      };
-    } catch (error) {
-      throw new RpcException(error.message);
-    }
-  }
-
-  /**
-   * Update map brand configuration
-   * @param { UserBrandConfigurationDto } userBrandConfigurationDto
-   * @return
-   */
-  async updateUserBrandConfiguration(
-    userBrandConfigurationDto: UserBrandConfigurationDto,
-  ) {
-    let user = await this.repository.find({
-      key: '_id',
-      value: userBrandConfigurationDto.user_id,
-    });
-    try {
-      user.brand.configuration = userBrandConfigurationDto;
-      user = await this.repository.update(user._id, user);
-      return {
-        success: true,
-        user,
-        message: 'Map Configuration Update Success',
       };
     } catch (error) {
       throw new RpcException(error.message);

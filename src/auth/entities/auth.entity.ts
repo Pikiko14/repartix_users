@@ -1,3 +1,10 @@
+export enum TypeUser {
+  admin = "admin",
+  sender = "sender",
+  delivery = "delivery",
+  employe = "employe"
+}
+
 export class UserEntity {
   username: string;
   password: string;
@@ -9,6 +16,7 @@ export class UserEntity {
   _id?: string;
   recovery_token?: string;
   password_string?: string;
+  type_user: TypeUser;
 }
 
 interface IProfile {

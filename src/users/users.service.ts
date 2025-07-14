@@ -1,14 +1,19 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { AuthService } from 'src/auth/auth.service';
+import { RpcException } from '@nestjs/microservices';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserBrandDto } from './dto/update-user-brand.dto';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
-import { UpdateUserCredentialDto } from './dto/update-user-credential.dto';
+import { AuthRepository } from 'src/auth/repository/auth.repository';
 import { UserBrandConfigurationDto } from './dto/update-map-brand.dto';
+import { UpdateUserCredentialDto } from './dto/update-user-credential.dto';
 
 @Injectable()
 export class UsersService {
-  constructor(@Inject() private readonly authService: AuthService) {}
+  constructor(
+    @Inject() private readonly authService: AuthService,
+    @Inject() private readonly userRepository: AuthRepository
+  ) {}
 
   async create(createUserDto: CreateUserDto) {
     return await this.authService.signUp(createUserDto);
@@ -36,7 +41,21 @@ export class UsersService {
    * @param { UpdateUserCredentialDto } updateDredentialsDto
    */
   async updateUserProfile(updateUserProfileDto: UpdateUserProfileDto) {
-    return await this.authService.updateUserProfile(updateUserProfileDto);
+    let user = await this.userRepository.find({
+      key: '_id',
+      value: updateUserProfileDto.user_id,
+    });
+    try {
+      user.profile = updateUserProfileDto;
+      user = await this.userRepository.update(user._id, user);
+      return {
+        success: true,
+        user,
+        message: 'Profile Update Success',
+      };
+    } catch (error) {
+      throw new RpcException(error.message);
+    }
   }
 
   /**
@@ -44,7 +63,21 @@ export class UsersService {
    * @param { UpdateUserBrandDto } updateUserBrandDto
    */
   async updateUserBrand(updateUserBrandDto: UpdateUserBrandDto) {
-    return await this.authService.updateUserBrand(updateUserBrandDto);
+    let user = await this.userRepository.find({
+      key: '_id',
+      value: updateUserBrandDto.user_id,
+    });
+    try {
+      user.brand = updateUserBrandDto as any;
+      user = await this.userRepository.update(user._id, user);
+      return {
+        success: true,
+        user,
+        message: 'Profile Update Success',
+      };
+    } catch (error) {
+      throw new RpcException(error.message);
+    }
   }
 
   /**
@@ -54,6 +87,20 @@ export class UsersService {
   async updateUserBrandConfiguration(
     updateUserBrandConfigurationDto: UserBrandConfigurationDto,
   ) {
-    return await this.authService.updateUserBrandConfiguration(updateUserBrandConfigurationDto);
+    let user = await this.userRepository.find({
+      key: '_id',
+      value: updateUserBrandConfigurationDto.user_id,
+    });
+    try {
+      user.brand.configuration = updateUserBrandConfigurationDto;
+      user = await this.userRepository.update(user._id, user);
+      return {
+        success: true,
+        user,
+        message: 'Map Configuration Update Success',
+      };
+    } catch (error) {
+      throw new RpcException(error.message);
+    };
   }
 }

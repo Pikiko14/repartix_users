@@ -1,4 +1,5 @@
 import { HydratedDocument } from 'mongoose';
+import { TypeUser } from '../entities/auth.entity';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 export type UserDocument = HydratedDocument<User>;
@@ -88,6 +89,9 @@ export class User {
 
   @Prop({ type: BrandSchema })
   brand: Brand;
+
+  @Prop({ enum: ['admin', 'sender', 'delivery', 'employe'], default: 'admin' })
+  type_user: TypeUser;
 }
 
 export const UsersSchema = SchemaFactory.createForClass(User);
