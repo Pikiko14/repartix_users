@@ -3,6 +3,7 @@ import { AuthService } from 'src/auth/auth.service';
 import { RpcException } from '@nestjs/microservices';
 import { CreateUserDto } from './dto/create-user.dto';
 import { TypeUser } from 'src/auth/entities/auth.entity';
+import { CacheService } from 'src/commons/cache/cache.service';
 import { QueryParamDto } from 'src/commons/dto/query-param.dto';
 import { UpdateUserBrandDto } from './dto/update-user-brand.dto';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
@@ -14,33 +15,46 @@ import { UpdateUserCredentialDto } from './dto/update-user-credential.dto';
 export class UsersService {
   constructor(
     @Inject() private readonly authService: AuthService,
-    @Inject() private readonly userRepository: AuthRepository
+    @Inject() private readonly cacheService: CacheService,
+    @Inject() private readonly userRepository: AuthRepository,
   ) {}
 
   /**
    * Create user
-   * @param { CreateUserDto } createUserDto 
-   * @returns 
+   * @param { CreateUserDto } createUserDto
+   * @returns
    */
   async create(createUserDto: CreateUserDto) {
+    await this.cacheService.removeByPrefix(`keyv:${createUserDto.parent_id}:users:list`);
     return await this.authService.signUp(createUserDto);
   }
 
   /**
    * List users
-   * @param queryParams 
+   * @param queryParams
    */
   async get(queryParams: QueryParamDto) {
     try {
+      // Generamos un key única para la cache basada en los queryParams
+      const cacheKey = `${queryParams.parent_id}:users:list:${JSON.stringify(queryParams)}`;
+      let users = await this.cacheService.getItem(cacheKey);
+      if (users) {
+        return {
+          success: true,
+          users,
+          message: 'Users list (from cache)',
+        };
+      }
+
       // prepare query data
       let query: Record<string, any> = {
         parent_id: queryParams.parent_id,
-        type_user: TypeUser.employe
-      }
+        type_user: TypeUser.employe,
+      };
 
       // validamos la busqueda
       if (queryParams.search) {
-        const searchRegex = new RegExp(queryParams.search as string, "i");
+        const searchRegex = new RegExp(queryParams.search as string, 'i');
         query = {
           $or: [
             { email: searchRegex },
@@ -56,11 +70,14 @@ export class UsersService {
       const perPage = queryParams.perPage || 7;
       const skip = (parseInt(page as string) - 1) * parseInt(perPage as string);
 
-      const users = await this.userRepository.paginate(
+      users = await this.userRepository.paginate(
         query,
         skip,
         perPage as number,
       );
+
+      // Guardamos el resultado en cache por 10 minutos
+      await this.cacheService.setItem(cacheKey, users);
 
       return {
         success: true,
@@ -154,6 +171,6 @@ export class UsersService {
       };
     } catch (error) {
       throw new RpcException(error.message);
-    };
+    }
   }
 }

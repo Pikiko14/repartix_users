@@ -9,6 +9,8 @@ interface EnvVars {
   JWT_SECRET: string;
   NATS_URL: string;
   NATH_SERVICE: string;
+  REDIS_HOST: string;
+  REDIS_PORT: number;
 }
 
 const envsSchema = joi.object({
@@ -19,6 +21,8 @@ const envsSchema = joi.object({
   JWT_SECRET: joi.string().required(),
   NATS_URL: joi.string().required(),
   NATH_SERVICE: joi.string().required(),
+  REDIS_HOST: joi.string().required(),
+  REDIS_PORT: joi.number().required(),
 })
 .unknown(true);
 
@@ -42,4 +46,6 @@ export const envs = {
   jwt_secret: envVars.JWT_SECRET,
   nats_server: envVars.NATS_URL,
   nats_service_name: envVars.NATH_SERVICE,
+  redis_host: envVars.REDIS_HOST,
+  redis_port: envVars.REDIS_PORT,
 }

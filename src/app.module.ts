@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { AuthModule } from './auth/auth.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UsersModule } from './users/users.module';
+import { CacheServiceModule } from './commons/cache/cache.module';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { UsersModule } from './users/users.module';
     ),
     AuthModule,
     UsersModule,
+    CacheServiceModule,
   ],
   controllers: [],
   providers: [],
