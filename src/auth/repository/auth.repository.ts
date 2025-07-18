@@ -99,7 +99,7 @@ export class AuthRepository implements IAuthRepository {
     query: Record<string, any>,
     skip: number,
     perPage: number,
-    fields: string[] = [],
+    fields: string[] = ['_id', 'username', 'email', 'profile.full_name', 'type_user', 'scopes'],
   ): Promise<PaginationResponseInterface> {
     try {
       // Fetch paginated data
