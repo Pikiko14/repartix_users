@@ -1,13 +1,14 @@
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { Controller, UseGuards } from '@nestjs/common';
+import { QueryParamDto } from 'src/commons/dto/query-param.dto';
 import { MessagePattern, Payload } from '@nestjs/microservices';
+import { UpdateUserBrandDto } from './dto/update-user-brand.dto';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
+import { UserBrandConfigurationDto } from './dto/update-map-brand.dto';
 import { Usability } from 'src/commons/decorators/usability.decotator';
 import { UsabilitiesGuard } from 'src/commons/guards/usabilities.guard';
 import { UpdateUserCredentialDto } from './dto/update-user-credential.dto';
-import { UpdateUserBrandDto } from './dto/update-user-brand.dto';
-import { UserBrandConfigurationDto } from './dto/update-map-brand.dto';
 
 @Controller()
 export class UsersController {
@@ -40,5 +41,12 @@ export class UsersController {
     @Payload() updateUserBrandConfigurationDto: UserBrandConfigurationDto,
   ) {
     return this.usersService.updateUserBrandConfiguration(updateUserBrandConfigurationDto);
+  }
+
+  @MessagePattern('list-users')
+  listUsers(
+    @Payload() queryParams: QueryParamDto,
+  ) {
+    return this.usersService.get(queryParams);
   }
 }

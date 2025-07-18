@@ -2,6 +2,8 @@ import { Inject, Injectable } from '@nestjs/common';
 import { AuthService } from 'src/auth/auth.service';
 import { RpcException } from '@nestjs/microservices';
 import { CreateUserDto } from './dto/create-user.dto';
+import { TypeUser } from 'src/auth/entities/auth.entity';
+import { QueryParamDto } from 'src/commons/dto/query-param.dto';
 import { UpdateUserBrandDto } from './dto/update-user-brand.dto';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 import { AuthRepository } from 'src/auth/repository/auth.repository';
@@ -15,8 +17,59 @@ export class UsersService {
     @Inject() private readonly userRepository: AuthRepository
   ) {}
 
+  /**
+   * Create user
+   * @param { CreateUserDto } createUserDto 
+   * @returns 
+   */
   async create(createUserDto: CreateUserDto) {
     return await this.authService.signUp(createUserDto);
+  }
+
+  /**
+   * List users
+   * @param queryParams 
+   */
+  async get(queryParams: QueryParamDto) {
+    try {
+      // prepare query data
+      let query: Record<string, any> = {
+        parent_id: queryParams.parent_id,
+        type_user: TypeUser.employe
+      }
+
+      // validamos la busqueda
+      if (queryParams.search) {
+        const searchRegex = new RegExp(queryParams.search as string, "i");
+        query = {
+          $or: [
+            { email: searchRegex },
+            { username: searchRegex },
+            { 'profile.full_name': searchRegex },
+            { 'profile.phone': searchRegex },
+          ],
+        };
+      }
+
+      // validamos la data de la paginacion
+      const page = queryParams.page || 1;
+      const perPage = queryParams.perPage || 7;
+      const skip = (parseInt(page as string) - 1) * parseInt(perPage as string);
+
+      const users = await this.userRepository.paginate(
+        query,
+        skip,
+        perPage as number,
+      );
+
+      return {
+        success: true,
+        users,
+        message: 'Users list',
+      };
+    } catch (error) {
+      throw new RpcException(error.message);
+    }
   }
 
   /**
