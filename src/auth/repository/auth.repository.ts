@@ -66,10 +66,18 @@ export class AuthRepository implements IAuthRepository {
 
   /**
    * Delete users
-   * @param id
+   * @param { string } id
+   * @param { string } parent
    */
-  async delete(id: string): Promise<void> {
-    throw new Error('Method not implemented.');
+  async delete(id: string, parent: string): Promise<void> {
+    try {
+      return await this.model.findOneAndDelete({ _id: id, parent_id: parent });
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        status: HttpStatus.BAD_REQUEST,
+      });
+    }
   }
 
   /**

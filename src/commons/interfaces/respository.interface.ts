@@ -8,5 +8,5 @@ export interface IAuthRepository {
   
   update(id: string, user: UserEntity): Promise<UserEntity | null>;
   
-  delete(id: string): Promise<void>;
+  delete(id: string, parent_id: string): Promise<void>;
 }

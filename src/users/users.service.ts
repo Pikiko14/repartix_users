@@ -2,6 +2,7 @@ import { AuthService } from 'src/auth/auth.service';
 import { RpcException } from '@nestjs/microservices';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { DeleteUsersDto } from './dto/delete-user.dto';
 import { TypeUser } from 'src/auth/entities/auth.entity';
 import { CacheService } from 'src/commons/cache/cache.service';
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
@@ -144,6 +145,32 @@ export class UsersService {
         success: true,
         data: user,
         message: 'User Update Success',
+      };
+    } catch (error) {
+      throw new RpcException(error.message);
+    }
+  }
+
+  /**
+   * Delete users
+   * @param { DeleteUsersDto } deleteUserDto
+   */
+  async deleteUsers(deleteUserDto: DeleteUsersDto) {
+    await this.cacheService.removeByPrefix(
+      `keyv:${deleteUserDto.parent_id}:users:list`,
+    );
+
+    try {
+      let user = await this.userRepository.delete(
+        deleteUserDto.id,
+        deleteUserDto.parent_id,
+      );
+
+      // return data
+      return {
+        success: true,
+        data: null,
+        message: 'User delete success',
       };
     } catch (error) {
       throw new RpcException(error.message);

@@ -2,6 +2,7 @@ import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { Controller, UseGuards } from '@nestjs/common';
+import { DeleteUsersDto } from './dto/delete-user.dto';
 import { QueryParamDto } from 'src/commons/dto/query-param.dto';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { UpdateUserBrandDto } from './dto/update-user-brand.dto';
@@ -57,5 +58,12 @@ export class UsersController {
   ) {
     delete updateUsersDto._id;
     return this.usersService.update(updateUsersDto);
+  }
+
+  @MessagePattern('delete-users')
+  deleteUsers(
+    @Payload() deleteUsersDto: DeleteUsersDto,
+  ) {
+    return this.usersService.deleteUsers(deleteUsersDto);
   }
 }
