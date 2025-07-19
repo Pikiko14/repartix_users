@@ -1,3 +1,4 @@
+import * as bcrypt from 'bcrypt';
 import { AuthService } from 'src/auth/auth.service';
 import { RpcException } from '@nestjs/microservices';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -137,6 +138,10 @@ export class UsersService {
           message: `Exist one user with this username: ${updateUserDto.username}.`,
           status: HttpStatus.CONFLICT,
         });
+
+      if (updateUserDto.password) {
+        updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
+      }
 
       user = await this.userRepository.update(user._id, updateUserDto);
 
