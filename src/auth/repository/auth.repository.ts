@@ -4,6 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User } from './../schemas/users.schema';
 import { UserEntity } from '../entities/auth.entity';
 import { RpcException } from '@nestjs/microservices';
+import { UpdateUserDto } from 'src/users/dto/update-user.dto';
 import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
 import { IAuthRepository } from 'src/commons/interfaces/respository.interface';
 import { PaginationResponseInterface } from 'src/commons/interfaces/response.interface';
@@ -52,7 +53,7 @@ export class AuthRepository implements IAuthRepository {
    * @param user
    * @returns
    */
-  async update(id: string, user: UserEntity): Promise<UserEntity | null> {
+  async update(id: string, user: UserEntity | UpdateUserDto): Promise<UserEntity | null> {
     try {
       return await this.model.findByIdAndUpdate(id, user, { new: true });
     } catch (error) {

@@ -1,6 +1,6 @@
 export interface ResponseRequestInterface {
   success?: boolean;
-  data?: any;
+  data: any;
   message?: string;
   error?: boolean;
 }

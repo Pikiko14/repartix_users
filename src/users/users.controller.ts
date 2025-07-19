@@ -1,4 +1,5 @@
 import { UsersService } from './users.service';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { Controller, UseGuards } from '@nestjs/common';
 import { QueryParamDto } from 'src/commons/dto/query-param.dto';
@@ -48,5 +49,12 @@ export class UsersController {
     @Payload() queryParams: QueryParamDto,
   ) {
     return this.usersService.get(queryParams);
+  }
+
+  @MessagePattern('update-users')
+  updateUsers(
+    @Payload() updateUsersDto: UpdateUserDto,
+  ) {
+    return this.usersService.update(updateUsersDto);
   }
 }

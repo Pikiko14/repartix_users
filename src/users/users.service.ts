@@ -1,15 +1,17 @@
-import { Inject, Injectable } from '@nestjs/common';
 import { AuthService } from 'src/auth/auth.service';
 import { RpcException } from '@nestjs/microservices';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { TypeUser } from 'src/auth/entities/auth.entity';
 import { CacheService } from 'src/commons/cache/cache.service';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { QueryParamDto } from 'src/commons/dto/query-param.dto';
 import { UpdateUserBrandDto } from './dto/update-user-brand.dto';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 import { AuthRepository } from 'src/auth/repository/auth.repository';
 import { UserBrandConfigurationDto } from './dto/update-map-brand.dto';
 import { UpdateUserCredentialDto } from './dto/update-user-credential.dto';
+import { ResponseRequestInterface } from 'src/commons/interfaces/response.interface';
 
 @Injectable()
 export class UsersService {
@@ -25,7 +27,9 @@ export class UsersService {
    * @returns
    */
   async create(createUserDto: CreateUserDto) {
-    await this.cacheService.removeByPrefix(`keyv:${createUserDto.parent_id}:users:list`);
+    await this.cacheService.removeByPrefix(
+      `keyv:${createUserDto.parent_id}:users:list`,
+    );
     return await this.authService.signUp(createUserDto);
   }
 
@@ -33,7 +37,9 @@ export class UsersService {
    * List users
    * @param queryParams
    */
-  async get(queryParams: QueryParamDto) {
+  async get(
+    queryParams: QueryParamDto,
+  ): Promise<ResponseRequestInterface | any> {
     try {
       // Generamos un key única para la cache basada en los queryParams
       const cacheKey = `${queryParams.parent_id}:users:list:${JSON.stringify(queryParams)}`;
@@ -83,6 +89,61 @@ export class UsersService {
         success: true,
         users,
         message: 'Users list',
+      };
+    } catch (error) {
+      throw new RpcException(error.message);
+    }
+  }
+
+  /**
+   * Update users
+   * @param { UpdateUserDto }
+   */
+  async update(updateUserDto: UpdateUserDto) {
+    await this.cacheService.removeByPrefix(
+      `keyv:${updateUserDto.parent_id}:users:list`,
+    );
+    try {
+      let user = await this.userRepository.find({
+        key: '_id',
+        value: updateUserDto.id,
+      });
+
+      // validate if user exist with this email
+      const issetUserWithEmail = await this.userRepository.find({
+        key: 'email',
+        value: updateUserDto.email,
+      });
+      if (
+        issetUserWithEmail &&
+        issetUserWithEmail._id.toString() !== updateUserDto.id
+      )
+        throw new RpcException({
+          message: `Exist one user with this email: ${updateUserDto.email}.`,
+          status: HttpStatus.CONFLICT,
+        });
+
+      // validate if yser exist with this username
+      const issetUserWithUsername = await this.userRepository.find({
+        key: 'username',
+        value: updateUserDto.username,
+      });
+      if (
+        issetUserWithUsername &&
+        issetUserWithUsername._id.toString() !== updateUserDto.id
+      )
+        throw new RpcException({
+          message: `Exist one user with this username: ${updateUserDto.username}.`,
+          status: HttpStatus.CONFLICT,
+        });
+
+      user = await this.userRepository.update(user._id, updateUserDto);
+
+      // return data
+      return {
+        success: true,
+        data: user,
+        message: 'User Update Success',
       };
     } catch (error) {
       throw new RpcException(error.message);
