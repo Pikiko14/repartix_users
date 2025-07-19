@@ -55,6 +55,7 @@ export class UsersController {
   updateUsers(
     @Payload() updateUsersDto: UpdateUserDto,
   ) {
+    delete updateUsersDto._id;
     return this.usersService.update(updateUsersDto);
   }
 }
