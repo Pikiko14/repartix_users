@@ -17,6 +17,7 @@ export class UserEntity {
   recovery_token?: string;
   password_string?: string;
   type_user: TypeUser;
+  courier_info?: ICourierInfo; 
 }
 
 interface IProfile {
@@ -24,6 +25,7 @@ interface IProfile {
   address?: string;
   phone?: number;
   age?: number;
+  dni?: string;
 }
 
 interface IBrand {
@@ -43,3 +45,29 @@ interface IConfiguration {
   enable_google_map?: boolean;
   price_by_km?: number;
 }
+
+interface ICourierInfo {
+  vehicle_type?: VehicleType;
+  license_plate?: string;
+  driving_license_number?: string;
+  has_insurance?: boolean;
+  insurance_expiry?: Date;
+  is_active?: boolean;
+  contract_type?: ContractType;
+  amount_by_delivery?: number;
+}
+
+export enum ContractType {
+  fixed = "fixed",
+  per_delivery = "per_delivery"
+}
+
+export enum VehicleType {
+  bike = "bike",
+  motorcycle = "motorcycle",
+  car = "car",
+  on_foot = "on_foot",
+  scooter = "scooter",
+  other = "other"
+}
+

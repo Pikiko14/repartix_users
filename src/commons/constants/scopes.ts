@@ -3,5 +3,9 @@ export const scopes = [
     'create-user',
     'update-user',
     'delete-user',
-    'update-brand'
+    'update-brand',
+    'list-couriers',
+    'create-couriers',
+    'update-couriers',
+    'delete-couriers',
 ];
