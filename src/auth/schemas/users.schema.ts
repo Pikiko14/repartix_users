@@ -1,6 +1,35 @@
 import { HydratedDocument } from 'mongoose';
 import { TypeUser } from '../entities/auth.entity';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { ContractType, VehicleType } from '../entities/auth.entity';
+
+@Schema({ _id: false })
+class CourierInfo {
+  @Prop({ enum: Object.values(VehicleType) })
+  vehicle_type?: VehicleType;
+
+  @Prop()
+  license_plate?: string;
+
+  @Prop()
+  driving_license_number?: string;
+
+  @Prop()
+  has_insurance?: boolean;
+
+  @Prop()
+  insurance_expiry?: Date;
+
+  @Prop()
+  is_active?: boolean;
+
+  @Prop({ enum: Object.values(ContractType) })
+  contract_type?: ContractType;
+
+  @Prop()
+  amount_by_delivery?: number;
+}
+export const CourierInfoSchema = SchemaFactory.createForClass(CourierInfo);
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -92,6 +121,9 @@ export class User {
 
   @Prop({ enum: ['admin', 'sender', 'delivery', 'employe'], default: 'admin' })
   type_user: TypeUser;
+
+  @Prop({ type: CourierInfoSchema })
+  courier_info?: CourierInfo;
 }
 
 export const UsersSchema = SchemaFactory.createForClass(User);
