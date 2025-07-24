@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsNumber, MaxLength } from 'class-validator';
+import { IsString, MaxLength, IsOptional, IsNumber } from 'class-validator';
 
 export class ProfileDto {
   @IsString()
@@ -10,10 +10,13 @@ export class ProfileDto {
   address?: string;
 
   @IsOptional()
-  @IsNumber()
-  phone?: number;
+  @IsString()
+  phone?: string;
 
   @IsOptional()
   @IsNumber()
   age?: number;
+
+  @IsOptional()
+  dni?: string;
 }
