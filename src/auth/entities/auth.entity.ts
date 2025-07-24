@@ -54,7 +54,7 @@ interface ICourierInfo {
   insurance_expiry?: Date;
   is_active?: boolean;
   contract_type?: ContractType;
-  amount_by_delivery?: number;
+  amount_by_delivery?: string;
 }
 
 export enum ContractType {

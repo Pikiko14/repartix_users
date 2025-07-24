@@ -41,6 +41,6 @@ export class CourierInfoDto {
   contract_type: ContractType;
 
   @IsOptional()
-  @IsNumber()
-  amount_by_delivery?: number;
+  @IsString()
+  amount_by_delivery?: string;
 }
