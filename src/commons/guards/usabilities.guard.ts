@@ -59,7 +59,6 @@ export class UsabilitiesGuard implements CanActivate {
 
         // validamos la cantidad de usos disponibles
         const { count } = planHaveUsability;
-        console.log(count);
 
         // 
       }

@@ -1,19 +1,21 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { AuthService } from 'src/auth/auth.service';
+import { RpcException } from '@nestjs/microservices';
+import { TypeUser } from 'src/auth/entities/auth.entity';
 import { CreateCourierDto } from './dto/create-courier.dto';
 import { CacheService } from 'src/commons/cache/cache.service';
+import { QueryParamDto } from 'src/commons/dto/query-param.dto';
+import { AuthRepository } from 'src/auth/repository/auth.repository';
+import { ResponseRequestInterface } from 'src/commons/interfaces/response.interface';
 
 @Injectable()
 export class CouriersService {
-  scopes = [
-    'list-order',
-    'update-order',
-    'update-user',
-  ];
+  scopes = ['list-order', 'update-order', 'update-user'];
 
   constructor(
     @Inject() private readonly authService: AuthService,
     @Inject() private readonly cacheService: CacheService,
+    @Inject() private readonly userRepository: AuthRepository,
   ) {}
 
   async create(createCourierDto: CreateCourierDto) {
@@ -22,5 +24,81 @@ export class CouriersService {
     );
     createCourierDto.scopes = this.scopes;
     return await this.authService.signUp(createCourierDto);
+  }
+
+  /**
+   * List users
+   * @param queryParams
+   */
+  async get(
+    queryParams: QueryParamDto,
+  ): Promise<ResponseRequestInterface | any> {
+    try {
+      // Generamos un key única para la cache basada en los queryParams
+      const cacheKey = `${queryParams.parent_id}:couriers:list:${JSON.stringify(queryParams)}`;
+      let users = await this.cacheService.getItem(cacheKey);
+      if (users) {
+        return {
+          success: true,
+          users,
+          message: 'Couriers list (from cache)',
+        };
+      }
+
+      // prepare query data
+      let query: Record<string, any> = {
+        parent_id: queryParams.parent_id,
+        type_user: TypeUser.delivery,
+      };
+
+      // validamos la busqueda
+      if (queryParams.search) {
+        const searchRegex = new RegExp(queryParams.search as string, 'i');
+        query = {
+          $or: [
+            { email: searchRegex },
+            { username: searchRegex },
+            { 'profile.dni': searchRegex },
+            { 'profile.phone': searchRegex },
+            { 'profile.full_name': searchRegex },
+            { 'courier_info.vehicle_type': searchRegex },
+            { 'courier_info.contract_type': searchRegex },
+            { 'courier_info.license_plate': searchRegex },
+            { 'courier_info.driving_license_number': searchRegex },
+          ],
+        };
+      }
+
+      // validamos la data de la paginacion
+      const page = queryParams.page || 1;
+      const perPage = queryParams.perPage || 7;
+      const skip = (parseInt(page as string) - 1) * parseInt(perPage as string);
+
+      users = await this.userRepository.paginate(
+        query,
+        skip,
+        perPage as number,
+        [
+          '_id',
+          'username',
+          'email',
+          'profile',
+          'type_user',
+          'scopes',
+          'courier_info',
+        ],
+      );
+
+      // Guardamos el resultado en cache por 10 minutos
+      await this.cacheService.setItem(cacheKey, users);
+
+      return {
+        success: true,
+        users,
+        message: 'Users list',
+      };
+    } catch (error) {
+      throw new RpcException(error.message);
+    }
   }
 }
