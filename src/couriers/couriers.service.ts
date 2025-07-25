@@ -3,6 +3,7 @@ import { AuthService } from 'src/auth/auth.service';
 import { RpcException } from '@nestjs/microservices';
 import { TypeUser } from 'src/auth/entities/auth.entity';
 import { CreateCourierDto } from './dto/create-courier.dto';
+import { DeleteUsersDto } from 'src/users/dto/delete-user.dto';
 import { CacheService } from 'src/commons/cache/cache.service';
 import { QueryParamDto } from 'src/commons/dto/query-param.dto';
 import { AuthRepository } from 'src/auth/repository/auth.repository';
@@ -101,4 +102,30 @@ export class CouriersService {
       throw new RpcException(error.message);
     }
   }
+
+  /**
+     * Delete couriers
+     * @param { DeleteUsersDto } deleteUserDto
+     */
+    async deleteCouriers(deleteUserDto: DeleteUsersDto) {
+      await this.cacheService.removeByPrefix(
+        `keyv:${deleteUserDto.parent_id}:couriers:list`,
+      );
+  
+      try {
+        const courier = await this.userRepository.delete(
+          deleteUserDto.id,
+          deleteUserDto.parent_id,
+        );
+  
+        // return data
+        return {
+          success: true,
+          data: courier,
+          message: 'Courier delete success',
+        };
+      } catch (error) {
+        throw new RpcException(error.message);
+      }
+    }
 }

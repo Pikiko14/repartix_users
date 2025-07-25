@@ -166,7 +166,7 @@ export class UsersService {
     );
 
     try {
-      let user = await this.userRepository.delete(
+      const user = await this.userRepository.delete(
         deleteUserDto.id,
         deleteUserDto.parent_id,
       );
@@ -174,7 +174,7 @@ export class UsersService {
       // return data
       return {
         success: true,
-        data: null,
+        data: user,
         message: 'User delete success',
       };
     } catch (error) {
