@@ -46,6 +46,9 @@ class Profile {
 
   @Prop()
   age?: number;
+
+  @Prop()
+  dni?: string;
 }
 export const ProfileSchema = SchemaFactory.createForClass(Profile);
 
