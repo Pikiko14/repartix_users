@@ -8,6 +8,7 @@ import { UpdateUserDto } from 'src/users/dto/update-user.dto';
 import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
 import { IAuthRepository } from 'src/commons/interfaces/respository.interface';
 import { PaginationResponseInterface } from 'src/commons/interfaces/response.interface';
+import { UpdateCourierDto } from 'src/couriers/dto/update-courier.dto';
 
 @Injectable()
 export class AuthRepository implements IAuthRepository {
@@ -53,7 +54,10 @@ export class AuthRepository implements IAuthRepository {
    * @param user
    * @returns
    */
-  async update(id: string, user: UserEntity | UpdateUserDto): Promise<UserEntity | null> {
+  async update(
+    id: string,
+    user: UserEntity | UpdateUserDto | UpdateCourierDto,
+  ): Promise<UserEntity | null> {
     try {
       return await this.model.findByIdAndUpdate(id, user, { new: true });
     } catch (error) {
@@ -108,7 +112,14 @@ export class AuthRepository implements IAuthRepository {
     query: Record<string, any>,
     skip: number,
     perPage: number,
-    fields: string[] = ['_id', 'username', 'email', 'profile.full_name', 'type_user', 'scopes'],
+    fields: string[] = [
+      '_id',
+      'username',
+      'email',
+      'profile.full_name',
+      'type_user',
+      'scopes',
+    ],
   ): Promise<PaginationResponseInterface> {
     try {
       // Fetch paginated data

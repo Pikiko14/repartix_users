@@ -6,6 +6,7 @@ import { QueryParamDto } from 'src/commons/dto/query-param.dto';
 import { Usability } from 'src/commons/decorators/usability.decotator';
 import { UsabilitiesGuard } from 'src/commons/guards/usabilities.guard';
 import { DeleteUsersDto } from 'src/users/dto/delete-user.dto';
+import { UpdateCourierDto } from './dto/update-courier.dto';
 
 @Controller('couriers')
 export class CouriersController {
@@ -26,6 +27,10 @@ export class CouriersController {
   @MessagePattern('delete-couriers')
   deleteCouriers(@Payload() deleteUsersDto: DeleteUsersDto) {
     return this.couriersService.deleteCouriers(deleteUsersDto);
-    return deleteUsersDto;
+  }
+
+  @MessagePattern('update-couriers')
+  updateCouriers(@Payload() updateCourierDto: UpdateCourierDto) {
+    return this.couriersService.updateCouriers(updateCourierDto);
   }
 }

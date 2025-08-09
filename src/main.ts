@@ -2,7 +2,7 @@ import { envs } from './configuration';
 import { AppModule } from './app.module';
 import { NestFactory } from '@nestjs/core';
 import { Logger, ValidationPipe } from '@nestjs/common';
-import { Transport, MicroserviceOptions } from '@nestjs/microservices';
+import { Transport, MicroserviceOptions, RpcException } from '@nestjs/microservices';
 
 const logger = new Logger();
 
@@ -26,6 +26,17 @@ async function bootstrap() {
       whitelist: true,
       forbidNonWhitelisted: true,
       transform: true,
+      exceptionFactory: (errors) => {
+        const formattedErrors = errors.map(err => ({
+          field: err.property,
+          errors: Object.values(err.constraints || {}),
+        }));
+        return new RpcException({
+          status: 'validation_error',
+          message: 'Validation failed',
+          errors: formattedErrors,
+        });
+      }
     }),
   );
 
