@@ -8,4 +8,8 @@ export const scopes = [
     'create-couriers',
     'update-couriers',
     'delete-couriers',
+    'list-city',
+    'create-city',
+    'update-city',
+    'delete-city',
 ];
