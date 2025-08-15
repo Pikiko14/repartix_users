@@ -42,10 +42,18 @@ export class AuthService {
    */
   async signIn(createAuthDto: SignInDto) {
     // validate isset user
-    const user = await this.repository.find({
+    let user = await this.repository.find({
       key: 'username',
       value: createAuthDto.username,
     });
+
+    if (!user) {
+      user = await this.repository.find({
+        key: 'email',
+        value: createAuthDto.username,
+      });
+    }
+
     if (!user)
       throw new RpcException({
         message: `User with this username: ${createAuthDto.username} don't found.`,
