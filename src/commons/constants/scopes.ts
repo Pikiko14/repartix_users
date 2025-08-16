@@ -12,4 +12,8 @@ export const scopes = [
   'create-city',
   'update-city',
   'delete-city',
+  'list-client',
+  'create-client',
+  'update-client',
+  'delete-client'
 ];
