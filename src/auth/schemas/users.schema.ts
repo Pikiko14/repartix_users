@@ -96,6 +96,51 @@ class Brand {
 }
 export const BrandSchema = SchemaFactory.createForClass(Brand);
 
+
+// senders schema
+@Schema({ _id: false })
+export class Coords {
+  @Prop({ type: Number, required: true })
+  lat: number;
+
+  @Prop({ type: Number, required: true })
+  lng: number;
+}
+@Schema({ _id: false })
+export class Address {
+  @Prop({ type: String, required: true })
+  address: string;
+
+  @Prop({ type: Coords, required: true })
+  coords: Coords;
+
+  @Prop({ type: String, required: true })
+  complement: string;
+}
+
+@Schema({ timestamps: true })
+export class SenderInfo {
+  @Prop({ type: String, required: false })
+  id?: string;
+
+  @Prop({ type: String, required: false })
+  _id?: string;
+
+  @Prop({ type: String, required: false })
+  rut?: string;
+
+  @Prop({ type: String, required: true })
+  brand_name: string;
+
+  @Prop({ type: String, required: true })
+  manager: string;
+
+  @Prop({ type: [Address], required: true })
+  address: Address[];
+}
+const SenderInfoSchema = SchemaFactory.createForClass(SenderInfo);
+// end sender schema
+
 @Schema({ autoIndex: true })
 export class User {
   @Prop({ required: true, unique: true, index: true })
@@ -127,6 +172,9 @@ export class User {
 
   @Prop({ type: CourierInfoSchema })
   courier_info?: CourierInfo;
+
+  @Prop({ type: SenderInfoSchema })
+  sender_info?: SenderInfo;
 }
 
 export const UsersSchema = SchemaFactory.createForClass(User);

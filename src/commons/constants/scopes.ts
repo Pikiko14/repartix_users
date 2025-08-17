@@ -15,5 +15,9 @@ export const scopes = [
   'list-client',
   'create-client',
   'update-client',
-  'delete-client'
+  'delete-client',
+  'list-sender',
+  'create-sender',
+  'update-sender',
+  'delete-sender'
 ];

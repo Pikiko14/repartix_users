@@ -5,6 +5,25 @@ export enum TypeUser {
   employe = "employe"
 }
 
+interface ISenderInfo {
+  id?: string;
+  _id?: string;
+  rut?: string;
+  brand_name: string;
+  manager: string;
+  address: Address[];
+}
+
+interface Address {
+  address: string;
+  coords: {
+    lat: number;
+    lng: number;
+  };
+  complement: string;
+}
+
+
 export class UserEntity {
   username: string;
   password: string;
@@ -17,7 +36,8 @@ export class UserEntity {
   recovery_token?: string;
   password_string?: string;
   type_user: TypeUser;
-  courier_info?: ICourierInfo; 
+  courier_info?: ICourierInfo;
+  sender_info?: ISenderInfo;
 }
 
 interface IProfile {

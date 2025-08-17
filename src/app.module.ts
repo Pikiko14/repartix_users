@@ -3,8 +3,9 @@ import { Module } from '@nestjs/common';
 import { AuthModule } from './auth/auth.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UsersModule } from './users/users.module';
-import { CacheServiceModule } from './commons/cache/cache.module';
+import { SendersModule } from './senders/senders.module';
 import { CouriersModule } from './couriers/couriers.module';
+import { CacheServiceModule } from './commons/cache/cache.module';
 
 @Module({
   imports: [
@@ -13,8 +14,9 @@ import { CouriersModule } from './couriers/couriers.module';
     ),
     AuthModule,
     UsersModule,
-    CacheServiceModule,
+    SendersModule,
     CouriersModule,
+    CacheServiceModule,
   ],
   controllers: [],
   providers: [],
