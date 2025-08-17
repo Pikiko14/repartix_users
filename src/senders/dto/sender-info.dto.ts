@@ -22,6 +22,9 @@ export class CreateSenderInfoDto {
   @IsNotEmpty()
   manager: string;
 
+  @IsString()
+  brand_phone?: string;
+
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => AddressDto)

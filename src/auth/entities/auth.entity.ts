@@ -11,6 +11,7 @@ interface ISenderInfo {
   rut?: string;
   brand_name: string;
   manager: string;
+  brand_phone?: string;
   address: Address[];
 }
 

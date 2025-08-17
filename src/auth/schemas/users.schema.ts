@@ -135,6 +135,9 @@ export class SenderInfo {
   @Prop({ type: String, required: true })
   manager: string;
 
+  @Prop({ type: String, required: false })
+  brand_phone?: string;
+
   @Prop({ type: [Address], required: true })
   address: Address[];
 }
