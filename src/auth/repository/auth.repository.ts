@@ -9,6 +9,7 @@ import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
 import { IAuthRepository } from 'src/commons/interfaces/respository.interface';
 import { PaginationResponseInterface } from 'src/commons/interfaces/response.interface';
 import { UpdateCourierDto } from 'src/couriers/dto/update-courier.dto';
+import { UpdateSenderDto } from 'src/senders/dto/update-sender.dto';
 
 @Injectable()
 export class AuthRepository implements IAuthRepository {
@@ -56,7 +57,7 @@ export class AuthRepository implements IAuthRepository {
    */
   async update(
     id: string,
-    user: UserEntity | UpdateUserDto | UpdateCourierDto,
+    user: UserEntity | UpdateUserDto | UpdateCourierDto | UpdateSenderDto,
   ): Promise<UserEntity | null> {
     try {
       return await this.model.findByIdAndUpdate(id, user, { new: true });

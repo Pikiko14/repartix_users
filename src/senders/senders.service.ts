@@ -1,17 +1,25 @@
-import { Inject, Injectable } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { AuthService } from 'src/auth/auth.service';
 import { RpcException } from '@nestjs/microservices';
 import { TypeUser } from 'src/auth/entities/auth.entity';
 import { CreateSenderDto } from './dto/create-sender.dto';
 import { UpdateSenderDto } from './dto/update-sender.dto';
 import { CacheService } from 'src/commons/cache/cache.service';
+import { DeleteUsersDto } from 'src/users/dto/delete-user.dto';
 import { QueryParamDto } from 'src/commons/dto/query-param.dto';
 import { AuthRepository } from 'src/auth/repository/auth.repository';
 import { ResponseRequestInterface } from 'src/commons/interfaces/response.interface';
 
 @Injectable()
 export class SendersService {
-  scopes = ['list-order', 'update-order', 'update-user', 'delete-order', 'update-user'];
+  scopes = [
+    'list-order',
+    'update-order',
+    'update-user',
+    'delete-order',
+    'update-user',
+  ];
 
   constructor(
     @Inject() private readonly authService: AuthService,
@@ -104,11 +112,101 @@ export class SendersService {
     }
   }
 
-  update(id: number, updateSenderDto: UpdateSenderDto) {
-    return `This action updates a #${id} sender`;
+  async update(updateSenderDto: UpdateSenderDto) {
+    await this.cacheService.removeByPrefix(
+      `keyv:${updateSenderDto.parent_id}:couriers:list`,
+    );
+
+    try {
+      let sender = await this.userRepository.find({
+        key: '_id',
+        value: updateSenderDto.id,
+      });
+
+      // validate if sender exist with this email
+      const issetUserWithEmail = await this.userRepository.find({
+        key: 'email',
+        value: updateSenderDto.email,
+      });
+      if (
+        issetUserWithEmail &&
+        issetUserWithEmail._id.toString() !== updateSenderDto.id
+      )
+        throw new RpcException({
+          message: `Exist one sender with this email: ${updateSenderDto.email}.`,
+          status: HttpStatus.CONFLICT,
+        });
+
+      // validate if sender exist with this username
+      const issetUserWithUsername = await this.userRepository.find({
+        key: 'username',
+        value: updateSenderDto.username,
+      });
+      if (
+        issetUserWithUsername &&
+        issetUserWithUsername._id.toString() !== updateSenderDto.id
+      )
+        throw new RpcException({
+          message: `Exist one user with this username: ${updateSenderDto.username}.`,
+          status: HttpStatus.CONFLICT,
+        });
+
+      if (updateSenderDto.password) {
+        updateSenderDto.password = await bcrypt.hash(
+          updateSenderDto.password,
+          10,
+        );
+      }
+
+      sender = await this.userRepository.update(sender._id, updateSenderDto);
+
+      // return data
+      return {
+        success: true,
+        data: sender,
+        message: 'Sender Update Success',
+      };
+    } catch (error) {
+      throw new RpcException(error.message);
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} sender`;
+  /**
+   * Delete couriers
+   * @param { DeleteUsersDto } deleteUserDto
+   */
+  async remove(deleteUserDto: DeleteUsersDto) {
+    let sender: any = await this.userRepository.find({
+      key: '_id',
+      value: deleteUserDto.id,
+    });
+
+    if (!sender) {
+      throw new RpcException({
+        message: `Sender with this id: ${deleteUserDto.id} not found`,
+        status: HttpStatus.NOT_FOUND,
+        error: false,
+      });
+    }
+
+    await this.cacheService.removeByPrefix(
+      `keyv:${deleteUserDto.parent_id}:senders:list`,
+    );
+
+    try {
+      sender = await this.userRepository.delete(
+        deleteUserDto.id,
+        deleteUserDto.parent_id,
+      );
+
+      // return data
+      return {
+        success: true,
+        data: sender,
+        message: 'Sender delete success',
+      };
+    } catch (error) {
+      throw new RpcException(error.message);
+    }
   }
 }

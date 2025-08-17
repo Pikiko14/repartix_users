@@ -2,6 +2,7 @@ import { Controller } from '@nestjs/common';
 import { SendersService } from './senders.service';
 import { CreateSenderDto } from './dto/create-sender.dto';
 import { UpdateSenderDto } from './dto/update-sender.dto';
+import { DeleteUsersDto } from 'src/users/dto/delete-user.dto';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { QueryParamDto } from 'src/commons/dto/query-param.dto';
 
@@ -23,11 +24,11 @@ export class SendersController {
 
   @MessagePattern('update-sender')
   update(@Payload() updateSenderDto: UpdateSenderDto) {
-    return this.sendersService.update(updateSenderDto.id, updateSenderDto);
+    return this.sendersService.update(updateSenderDto);
   }
 
   @MessagePattern('remove-sender')
-  remove(@Payload() id: number) {
-    return this.sendersService.remove(id);
+  remove(@Payload() deleteUsersDto: DeleteUsersDto) {
+    return this.sendersService.remove(deleteUsersDto);
   }
 }
