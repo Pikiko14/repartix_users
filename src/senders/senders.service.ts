@@ -96,6 +96,7 @@ export class SendersService {
           'sender_info.brand_name',
           'sender_info.manager',
           'sender_info.address',
+          'sender_info.brand_phone',
         ],
       );
 
