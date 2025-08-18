@@ -19,5 +19,9 @@ export const scopes = [
   'list-sender',
   'create-sender',
   'update-sender',
-  'delete-sender'
+  'delete-sender',
+  'list-order',
+  'create-order',
+  'update-order',
+  'delete-order',
 ];
