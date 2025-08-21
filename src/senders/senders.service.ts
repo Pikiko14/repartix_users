@@ -55,15 +55,16 @@ export class SendersService {
     }
 
     try {
-      // prepare query data
-      let query: Record<string, any> = {
-        parent_id: queryParams.parent_id,
-        type_user: TypeUser.sender,
-      };
+      // construimos condiciones con $and
+      const andConditions: any[] = [
+        { parent_id: queryParams.parent_id },
+        { type_user: TypeUser.sender },
+      ];
 
+      // validamos la búsqueda
       if (queryParams.search) {
         const searchRegex = new RegExp(queryParams.search as string, 'i');
-        query = {
+        andConditions.push({
           $or: [
             { email: searchRegex },
             { username: searchRegex },
@@ -74,31 +75,30 @@ export class SendersService {
             { 'sender_info.manager': searchRegex },
             { 'sender_info.rut': searchRegex },
           ],
-        };
+        });
       }
 
-      // validamos la data de la paginacion
-      const page = queryParams.page || 1;
-      const perPage = queryParams.perPage || 7;
-      const skip = (parseInt(page as string) - 1) * parseInt(perPage as string);
-      senders = await this.userRepository.paginate(
-        query,
-        skip,
-        perPage as number,
-        [
-          '_id',
-          'username',
-          'email',
-          'profile',
-          'type_user',
-          'scopes',
-          'sender_info.rut',
-          'sender_info.brand_name',
-          'sender_info.manager',
-          'sender_info.address',
-          'sender_info.brand_phone',
-        ],
-      );
+      // query final
+      const query: Record<string, any> = { $and: andConditions };
+
+      // paginación
+      const page = Number(queryParams.page) || 1;
+      const perPage = Number(queryParams.perPage) || 7;
+      const skip = (page - 1) * perPage;
+
+      senders = await this.userRepository.paginate(query, skip, perPage, [
+        '_id',
+        'username',
+        'email',
+        'profile',
+        'type_user',
+        'scopes',
+        'sender_info.rut',
+        'sender_info.brand_name',
+        'sender_info.manager',
+        'sender_info.address',
+        'sender_info.brand_phone',
+      ]);
 
       // Guardamos el resultado en cache por 10 minutos
       await this.cacheService.setItem(cacheKey, senders);

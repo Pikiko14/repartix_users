@@ -36,7 +36,7 @@ export class UsersService {
   }
 
   /**
-   * List users
+   * List users (employees)
    * @param queryParams
    */
   async get(
@@ -54,35 +54,34 @@ export class UsersService {
         };
       }
 
-      // prepare query data
-      let query: Record<string, any> = {
-        parent_id: queryParams.parent_id,
-        type_user: TypeUser.employe,
-      };
+      // Construimos condiciones en $and
+      const andConditions: any[] = [
+        { parent_id: queryParams.parent_id },
+        { type_user: TypeUser.employe },
+      ];
 
-      // validamos la busqueda
+      // validamos la búsqueda
       if (queryParams.search) {
         const searchRegex = new RegExp(queryParams.search as string, 'i');
-        query = {
+        andConditions.push({
           $or: [
             { email: searchRegex },
             { username: searchRegex },
             { 'profile.full_name': searchRegex },
             { 'profile.phone': searchRegex },
           ],
-        };
+        });
       }
 
-      // validamos la data de la paginacion
-      const page = queryParams.page || 1;
-      const perPage = queryParams.perPage || 7;
-      const skip = (parseInt(page as string) - 1) * parseInt(perPage as string);
+      // query final
+      const query: Record<string, any> = { $and: andConditions };
 
-      users = await this.userRepository.paginate(
-        query,
-        skip,
-        perPage as number,
-      );
+      // paginación
+      const page = Number(queryParams.page) || 1;
+      const perPage = Number(queryParams.perPage) || 7;
+      const skip = (page - 1) * perPage;
+
+      users = await this.userRepository.paginate(query, skip, perPage);
 
       // Guardamos el resultado en cache por 10 minutos
       await this.cacheService.setItem(cacheKey, users);

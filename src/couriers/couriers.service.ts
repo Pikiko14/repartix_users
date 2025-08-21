@@ -30,14 +30,14 @@ export class CouriersService {
   }
 
   /**
-   * List users
+   * List users (couriers)
    * @param queryParams
    */
   async get(
     queryParams: QueryParamDto,
   ): Promise<ResponseRequestInterface | any> {
     try {
-      // Generamos un key única para la cache basada en los queryParams
+      // Generamos una key única para la cache
       const cacheKey = `${queryParams.parent_id}:couriers:list:${JSON.stringify(queryParams)}`;
       let users = await this.cacheService.getItem(cacheKey);
       if (users) {
@@ -48,16 +48,16 @@ export class CouriersService {
         };
       }
 
-      // prepare query data
-      let query: Record<string, any> = {
-        parent_id: queryParams.parent_id,
-        type_user: TypeUser.delivery,
-      };
+      // Construimos condiciones en $and
+      const andConditions: any[] = [
+        { parent_id: queryParams.parent_id },
+        { type_user: TypeUser.delivery },
+      ];
 
-      // validamos la busqueda
+      // validamos la búsqueda
       if (queryParams.search) {
         const searchRegex = new RegExp(queryParams.search as string, 'i');
-        query = {
+        andConditions.push({
           $or: [
             { email: searchRegex },
             { username: searchRegex },
@@ -69,30 +69,28 @@ export class CouriersService {
             { 'courier_info.license_plate': searchRegex },
             { 'courier_info.driving_license_number': searchRegex },
           ],
-        };
+        });
       }
 
-      // validamos la data de la paginacion
-      const page = queryParams.page || 1;
-      const perPage = queryParams.perPage || 7;
-      const skip = (parseInt(page as string) - 1) * parseInt(perPage as string);
+      // query final
+      const query: Record<string, any> = { $and: andConditions };
 
-      users = await this.userRepository.paginate(
-        query,
-        skip,
-        perPage as number,
-        [
-          '_id',
-          'username',
-          'email',
-          'profile',
-          'type_user',
-          'scopes',
-          'courier_info',
-        ],
-      );
+      // paginación
+      const page = Number(queryParams.page) || 1;
+      const perPage = Number(queryParams.perPage) || 7;
+      const skip = (page - 1) * perPage;
 
-      // Guardamos el resultado en cache por 10 minutos
+      users = await this.userRepository.paginate(query, skip, perPage, [
+        '_id',
+        'username',
+        'email',
+        'profile',
+        'type_user',
+        'scopes',
+        'courier_info',
+      ]);
+
+      // Guardamos en cache por 10 minutos
       await this.cacheService.setItem(cacheKey, users);
 
       return {
