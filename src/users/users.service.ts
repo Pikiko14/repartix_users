@@ -280,6 +280,10 @@ export class UsersService {
   async updateUserBrandConfiguration(
     updateUserBrandConfigurationDto: UserBrandConfigurationDto,
   ) {
+    await this.cacheService.removeByPrefix(
+      `keyv:${updateUserBrandConfigurationDto.user_id}:users:list`,
+    );
+
     let user = await this.userRepository.find({
       key: '_id',
       value: updateUserBrandConfigurationDto.user_id,
