@@ -66,24 +66,12 @@ export class AuthService {
         message: 'Password incorrect',
         status: HttpStatus.UNAUTHORIZED,
       });
-    
-    let brandConfiguration = {};
-
-    if (user.parent_id) {
-      const parent = await this.repository.find({
-        key: '_id',
-        value: user.parent_id,
-      
-      });
-      if (parent && parent.brand) brandConfiguration = parent?.brand?.configuration || {};
-    }
 
     try {
       const token = await this.getJwtToken({
         id: user._id,
         parent: user.parent_id || null,
         scopes: user.scopes,
-        configuration: brandConfiguration,
       });
       const subscription = await firstValueFrom(
         this.client.send('get_user_subscription', user.parent_id || user._id),
@@ -170,7 +158,6 @@ export class AuthService {
           id: user._id,
           parent: user.parent_id || null,
           scopes: user.scopes,
-          configuration: {},
         }),
         message: 'Sign Up successfully',
       };
