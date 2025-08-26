@@ -196,7 +196,7 @@ export class UsersService {
    */
   async findConfiguration(id: string): Promise<any> {
     // Generamos un key única para la cache basada en los queryParams
-    const cacheKey = `keyv:${id}:users:list:configuration`;
+    const cacheKey = `${id}:users:list:configuration`;
     let config = await this.cacheService.getItem(cacheKey);
     if (config) {
       return {
