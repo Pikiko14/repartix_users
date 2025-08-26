@@ -191,6 +191,37 @@ export class UsersService {
   }
 
   /**
+   * Get users configuration
+   * @param { string } id
+   */
+  async findConfiguration(id: string): Promise<any> {
+    // Generamos un key única para la cache basada en los queryParams
+    const cacheKey = `keyv:${id}:users:list:configuration`;
+    let config = await this.cacheService.getItem(cacheKey);
+    if (config) {
+      return {
+        configuration: config || {}
+      };
+    }
+
+    try {
+      const user = await this.userRepository.find({
+        key: '_id',
+        value: id,
+      });
+
+      await this.cacheService.setItem(cacheKey, user?.brand?.configuration || {});
+
+      // return data
+      return {
+        configuration: user?.brand?.configuration || {}
+      };
+    } catch (error) {
+      throw new RpcException(error.message);
+    }
+  }
+
+  /**
    * Update user credential
    * @param { UpdateUserCredentialDto } updateDredentialsDto
    */

@@ -66,4 +66,11 @@ export class UsersController {
   ) {
     return this.usersService.deleteUsers(deleteUsersDto);
   }
+
+  @MessagePattern('find-configuration')
+  findUser(
+    @Payload() id: string,
+  ) {
+    return this.usersService.findConfiguration(id);
+  }
 }
