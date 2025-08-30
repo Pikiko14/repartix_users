@@ -20,6 +20,9 @@ export class SendersService {
     'update-user',
     'delete-order',
     'update-user',
+    'list-client',
+    'create-client',
+    'update-sender',
   ];
 
   constructor(
