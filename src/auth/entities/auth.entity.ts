@@ -66,6 +66,7 @@ interface IConfiguration {
   enable_google_map?: boolean;
   price_by_km?: number;
   statuses?: string;
+  payments?: string;
 }
 
 interface ICourierInfo {

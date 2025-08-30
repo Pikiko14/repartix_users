@@ -32,4 +32,8 @@ export class UserBrandConfigurationDto {
   @IsOptional()
   @IsString()
   statuses?: string;
+
+  @IsOptional()
+  @IsString()
+  payments?: string
 }

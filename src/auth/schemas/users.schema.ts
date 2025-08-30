@@ -74,6 +74,9 @@ class Configuration {
 
   @Prop({ required: false })
   statuses?: string;
+
+  @Prop({ required: false })
+  payments?: string;
 }
 export const ConfigurationSchema = SchemaFactory.createForClass(Configuration);
 
