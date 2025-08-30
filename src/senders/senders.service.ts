@@ -15,6 +15,7 @@ import { ResponseRequestInterface } from 'src/commons/interfaces/response.interf
 export class SendersService {
   scopes = [
     'list-order',
+    'create-order',
     'update-order',
     'update-user',
     'delete-order',
