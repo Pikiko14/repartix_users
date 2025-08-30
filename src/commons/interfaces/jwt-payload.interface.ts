@@ -3,4 +3,5 @@ export interface JwtPayloadInterface {
   parent: string | null;
   scopes: string[];
   configuration?: any;
+  type?: string;
 }
