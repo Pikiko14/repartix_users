@@ -28,4 +28,8 @@ export class UserBrandConfigurationDto {
   @IsOptional()
   @IsString()
   user_id?: number;
+
+  @IsOptional()
+  @IsString()
+  statuses?: string;
 }

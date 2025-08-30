@@ -71,6 +71,9 @@ class Configuration {
 
   @Prop()
   price_by_km?: number;
+
+  @Prop({ required: false })
+  statuses?: string;
 }
 export const ConfigurationSchema = SchemaFactory.createForClass(Configuration);
 
