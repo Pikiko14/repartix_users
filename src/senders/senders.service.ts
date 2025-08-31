@@ -120,7 +120,7 @@ export class SendersService {
 
   async update(updateSenderDto: UpdateSenderDto) {
     await this.cacheService.removeByPrefix(
-      `keyv:${updateSenderDto.parent_id}:couriers:list`,
+      `keyv:${updateSenderDto.parent_id}:senders:list`,
     );
 
     try {
