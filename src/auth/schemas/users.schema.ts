@@ -146,6 +146,9 @@ export class SenderInfo {
 
   @Prop({ type: [Address], required: true })
   address: Address[];
+
+  @Prop({ default: 0 })
+  discount_porcent?: number;
 }
 const SenderInfoSchema = SchemaFactory.createForClass(SenderInfo);
 // end sender schema

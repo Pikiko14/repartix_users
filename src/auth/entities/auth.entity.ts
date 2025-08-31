@@ -13,6 +13,7 @@ interface ISenderInfo {
   manager: string;
   brand_phone?: string;
   address: Address[];
+  discount_porcent?: number;
 }
 
 interface Address {
@@ -23,8 +24,6 @@ interface Address {
   };
   complement: string;
 }
-
-
 export class UserEntity {
   username: string;
   password: string;

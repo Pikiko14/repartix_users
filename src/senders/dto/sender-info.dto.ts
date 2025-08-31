@@ -29,6 +29,10 @@ export class CreateSenderInfoDto {
   @ValidateNested({ each: true })
   @Type(() => AddressDto)
   address: AddressDto[];
+
+  @IsOptional()
+  @IsNumber()
+  discount_porcent?: number;
 }
 
 export class CoordsDto {

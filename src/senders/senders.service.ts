@@ -102,6 +102,7 @@ export class SendersService {
         'sender_info.manager',
         'sender_info.address',
         'sender_info.brand_phone',
+        'sender_info.discount_porcent',
       ]);
 
       // Guardamos el resultado en cache por 10 minutos
