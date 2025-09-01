@@ -24,4 +24,8 @@ export const scopes = [
   'create-order',
   'update-order',
   'delete-order',
+  'create-shipping-list',
+  'list-shipping-list',
+  'update-shipping-list',
+  'delete-shipping-list',
 ];
