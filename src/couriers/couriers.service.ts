@@ -13,7 +13,7 @@ import { ResponseRequestInterface } from 'src/commons/interfaces/response.interf
 
 @Injectable()
 export class CouriersService {
-  scopes = ['list-order', 'update-order', 'update-user'];
+  scopes = ['list-order', 'update-order', 'update-user', 'list-shipping-list', 'update-shipping-list'];
 
   constructor(
     @Inject() private readonly authService: AuthService,
