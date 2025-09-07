@@ -33,6 +33,10 @@ export class CreateSenderInfoDto {
   @IsOptional()
   @IsNumber()
   discount_porcent?: number;
+
+  @IsOptional()
+  @IsNumber()
+  comission_porcent?: number;
 }
 
 export class CoordsDto {

@@ -14,6 +14,7 @@ interface ISenderInfo {
   brand_phone?: string;
   address: Address[];
   discount_porcent?: number;
+  comission_porcent?: number;
 }
 
 interface Address {

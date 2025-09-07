@@ -103,6 +103,7 @@ export class SendersService {
         'sender_info.address',
         'sender_info.brand_phone',
         'sender_info.discount_porcent',
+        'sender_info.comission_porcent'
       ]);
 
       // Guardamos el resultado en cache por 10 minutos

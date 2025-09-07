@@ -149,6 +149,9 @@ export class SenderInfo {
 
   @Prop({ default: 0 })
   discount_porcent?: number;
+
+  @Prop({ default: 0 })
+  comission_porcent?: number;
 }
 const SenderInfoSchema = SchemaFactory.createForClass(SenderInfo);
 // end sender schema
