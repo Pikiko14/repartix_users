@@ -153,7 +153,7 @@ export class AuthRepository implements IAuthRepository {
     try {
       return await this.model.find(
         { parent_id: parentId, type_user: TypeUser.delivery },
-        { _id: 1, name: { $concat: ['$profile.full_name', '-', '$profile.dni'] } }
+        { _id: 1, name: { $concat: ['$profile.full_name'] } }
       );
     } catch (error) {
       throw new RpcException({
