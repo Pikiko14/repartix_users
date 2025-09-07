@@ -191,4 +191,37 @@ export class CouriersService {
       throw new RpcException(error.message);
     }
   }
+
+  /**
+   * List for select
+   * @param { QueryParamDto } queryParamDto
+   */
+  async listForSelect(queryParams: QueryParamDto) {
+    try {
+      // cache
+      const cacheKey = `${queryParams.parent_id}:couriers:list:for-select:${JSON.stringify(queryParams)}`;
+      let couriers = await this.cacheService.getItem(cacheKey);
+      if (couriers) {
+        return {
+          success: true,
+          couriers,
+          message: 'Couriers for select (from cache)',
+        };
+      }
+
+      // get courier for select
+      couriers = await this.userRepository.courierForSelect(queryParams.parent_id);
+
+      await this.cacheService.setItem(cacheKey, couriers);
+
+      // return data
+      return {
+        success: true,
+        couriers,
+        message: 'Courier for select',
+      };
+    } catch (error) {
+      throw new RpcException(error.message);
+    }
+  }
 }

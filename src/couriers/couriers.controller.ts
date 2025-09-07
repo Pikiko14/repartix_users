@@ -33,4 +33,9 @@ export class CouriersController {
   updateCouriers(@Payload() updateCourierDto: UpdateCourierDto) {
     return this.couriersService.updateCouriers(updateCourierDto);
   }
+
+  @MessagePattern('find-couriers-for-select')
+  listForSelect(@Payload() queryParams: QueryParamDto) {
+    return this.couriersService.listForSelect(queryParams);
+  }
 }

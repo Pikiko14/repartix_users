@@ -1,15 +1,15 @@
 import { Model } from 'mongoose';
 import { SignUpDto } from '../dto/sign-up.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { User } from './../schemas/users.schema';
-import { UserEntity } from '../entities/auth.entity';
 import { RpcException } from '@nestjs/microservices';
 import { UpdateUserDto } from 'src/users/dto/update-user.dto';
+import { TypeUser, UserEntity } from '../entities/auth.entity';
+import { User, UserDocument } from './../schemas/users.schema';
+import { UpdateSenderDto } from 'src/senders/dto/update-sender.dto';
+import { UpdateCourierDto } from 'src/couriers/dto/update-courier.dto';
 import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
 import { IAuthRepository } from 'src/commons/interfaces/respository.interface';
 import { PaginationResponseInterface } from 'src/commons/interfaces/response.interface';
-import { UpdateCourierDto } from 'src/couriers/dto/update-courier.dto';
-import { UpdateSenderDto } from 'src/senders/dto/update-sender.dto';
 
 @Injectable()
 export class AuthRepository implements IAuthRepository {
@@ -142,6 +142,20 @@ export class AuthRepository implements IAuthRepository {
         totalItems: totalUsers,
       };
     } catch (error: any) {
+      throw new RpcException({
+        message: error.message,
+        status: HttpStatus.BAD_REQUEST,
+      });
+    }
+  }
+
+  async courierForSelect(parentId: string): Promise<UserDocument[]> {
+    try {
+      return await this.model.find(
+        { parent_id: parentId, type_user: TypeUser.delivery },
+        { _id: 1, name: { $concat: ['profile.full_name', 'profile.dni'] } }
+      );
+    } catch (error) {
       throw new RpcException({
         message: error.message,
         status: HttpStatus.BAD_REQUEST,
