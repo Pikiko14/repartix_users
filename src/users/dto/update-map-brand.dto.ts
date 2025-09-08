@@ -35,5 +35,9 @@ export class UserBrandConfigurationDto {
 
   @IsOptional()
   @IsString()
-  payments?: string
+  payments?: string;
+
+  @IsOptional()
+  @IsNumber()
+  insurance_percentage?: number;
 }

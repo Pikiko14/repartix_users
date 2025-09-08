@@ -67,6 +67,7 @@ interface IConfiguration {
   price_by_km?: number;
   statuses?: string;
   payments?: string;
+  insurance_percentage?: number;
 }
 
 interface ICourierInfo {
