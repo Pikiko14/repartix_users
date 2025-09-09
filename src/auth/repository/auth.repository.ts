@@ -162,4 +162,19 @@ export class AuthRepository implements IAuthRepository {
       });
     }
   }
+
+  /**
+   * Find User by key and value
+   * @param params
+   */
+  async findBy(query: Record<string, any>): Promise<UserEntity | null> {
+    try {
+      return await this.model.findOne(query);
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        status: HttpStatus.BAD_REQUEST,
+      });
+    }
+  }
 }

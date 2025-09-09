@@ -1,13 +1,14 @@
 import * as bcrypt from 'bcrypt';
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { AuthService } from 'src/auth/auth.service';
 import { RpcException } from '@nestjs/microservices';
+import { FindByNameDto } from './dto/find-by-name.dto';
 import { TypeUser } from 'src/auth/entities/auth.entity';
 import { CreateSenderDto } from './dto/create-sender.dto';
 import { UpdateSenderDto } from './dto/update-sender.dto';
 import { CacheService } from 'src/commons/cache/cache.service';
 import { DeleteUsersDto } from 'src/users/dto/delete-user.dto';
 import { QueryParamDto } from 'src/commons/dto/query-param.dto';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { AuthRepository } from 'src/auth/repository/auth.repository';
 import { ResponseRequestInterface } from 'src/commons/interfaces/response.interface';
 
@@ -212,6 +213,40 @@ export class SendersService {
         data: sender,
         message: 'Sender delete success',
       };
+    } catch (error) {
+      throw new RpcException(error.message);
+    }
+  }
+
+  /**
+   * find by name
+   * @param { any } findByName
+   */
+  async findByName(findByName: FindByNameDto) {
+    try {
+      const regex = new RegExp(findByName.name, 'i');
+      const query = {
+        parent_id: findByName.parent_id,
+        type_user: TypeUser.sender,
+        'sender_info.brand_name': regex,
+      }
+
+      const sender = await this.userRepository.findBy(query);
+
+      if (!sender) {
+        throw new RpcException({
+          message: `Sender with this name: ${findByName.name} not found`,
+          status: HttpStatus.NOT_FOUND,
+          error: false,
+        });
+      }
+
+      return {
+        success: true,
+        data: sender,
+        message: 'Sender find success',
+      }
+      
     } catch (error) {
       throw new RpcException(error.message);
     }

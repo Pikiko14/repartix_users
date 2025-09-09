@@ -1,5 +1,6 @@
 import { Controller } from '@nestjs/common';
 import { SendersService } from './senders.service';
+import { FindByNameDto } from './dto/find-by-name.dto';
 import { CreateSenderDto } from './dto/create-sender.dto';
 import { UpdateSenderDto } from './dto/update-sender.dto';
 import { DeleteUsersDto } from 'src/users/dto/delete-user.dto';
@@ -30,5 +31,10 @@ export class SendersController {
   @MessagePattern('remove-sender')
   remove(@Payload() deleteUsersDto: DeleteUsersDto) {
     return this.sendersService.remove(deleteUsersDto);
+  }
+
+  @MessagePattern('get-sender-by-name')
+  findByName(@Payload() findByNameDto: FindByNameDto) {
+    return this.sendersService.findByName(findByNameDto);
   }
 }
