@@ -13,7 +13,13 @@ import { ResponseRequestInterface } from 'src/commons/interfaces/response.interf
 
 @Injectable()
 export class CouriersService {
-  scopes = ['list-order', 'update-order', 'update-user', 'list-shipping-list', 'update-shipping-list'];
+  scopes = [
+    'list-order',
+    'update-order',
+    'update-user',
+    'list-shipping-list',
+    'update-shipping-list',
+  ];
 
   constructor(
     @Inject() private readonly authService: AuthService,
@@ -88,6 +94,9 @@ export class CouriersService {
         'type_user',
         'scopes',
         'courier_info',
+        'optimize-route',
+        'list-optimized-route',
+        'view-optimized-route',
       ]);
 
       // Guardamos en cache por 10 minutos
@@ -210,7 +219,9 @@ export class CouriersService {
       }
 
       // get courier for select
-      couriers = await this.userRepository.courierForSelect(queryParams.parent_id);
+      couriers = await this.userRepository.courierForSelect(
+        queryParams.parent_id,
+      );
 
       await this.cacheService.setItem(cacheKey, couriers);
 
