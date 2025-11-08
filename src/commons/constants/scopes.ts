@@ -30,4 +30,5 @@ export const scopes = [
   'delete-shipping-list',
   'list-reports',
   'optimize-route',
+  'list-optimized-route',
 ];
