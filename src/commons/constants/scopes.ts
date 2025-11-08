@@ -31,4 +31,5 @@ export const scopes = [
   'list-reports',
   'optimize-route',
   'list-optimized-route',
+  'view-optimized-route',
 ];
